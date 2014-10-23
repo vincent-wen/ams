@@ -1,0 +1,76 @@
+$black: #393939;
+$white: #B0B0B0;
+
+body {
+	background: $black;
+	color: $white;
+}
+
+#content-zone {
+	// background: white;
+	display: block;
+	position: absolute;
+	top: 52px;
+	bottom: 0;
+	padding: 30px;
+}
+
+#main-content {
+	background: grey;
+}
+
+#lg_panel {
+	opacity: 0;
+	color: $black;
+	display: block;
+	margin: 70px auto;
+	width: 350px;
+}
+#lg_panel.ng-show { opacity: 1;}
+
+.navbar li li a:hover{
+	color: white;
+	background-color: #3597C8;
+}
+
+.modal, .popover {
+	color: $black;
+}
+
+.input-group {
+	margin-bottom: 30px;
+}
+
+footer a:hover, footer a:focus,
+.section-footer a:hover, .section-footer a:focus {
+		text-decoration: none;
+}
+
+hr { width: 100%; }
+
+.text-grey {
+	color: grey;
+}
+
+.section-footer {
+	position: relative;
+	top: -25px;
+}
+
+.panel-body {
+	color: $black;
+}
+
+// AngularJS Animation
+
+.ng-enter, .ng-hide-remove,  {
+  -webkit-transition:1s ease-out all;
+  transition:1s ease-out all;
+}
+
+.ng-show {
+	-webkit-transition:2s ease-out all;
+  transition:2s ease-out all;
+}
+.ng-enter, .ng-hide { opacity: 0; }        /* starting animations */
+.ng-enter.ng-enter-active { opacity: 1; } /* terminal animations*/
