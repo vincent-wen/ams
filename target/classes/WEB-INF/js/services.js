@@ -9,15 +9,11 @@
 angular.module('app.services', []).
 
 service('userService',['$http', '$q', function($http, $q) {
-	var user = {};
 	var deferred = $q.defer();
 
-	$http.post('/api/get-current-user').success(function(data, status) {
-		user = data;
-		deferred.resolve({
-			username: user.username,
-			role: user.role
-		});
+	$http.post('/api/get-current-user').success(function(user, status) {
+		deferred.resolve(user);
 	});
+	
 	return deferred.promise;
 }]);

@@ -31,15 +31,14 @@
 					</footer>
 				</div>
 			</div>
-			<div id="collapse-{{key}}" class="panel-collapse collapse" ng-repeat="section in course.courseSections">
-				<div class="panel-body">
+			<div id="collapse-{{key}}" class="panel-collapse collapse">
+				<div class="panel-body" ng-repeat="section in course.courseSections">
 					<div>
 						<p>Time: {{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</p>
 						<p>Instructor: Dr. {{section.instructor.username}}</p>
 						<p>Location: {{section.location}}</p>
 					</div>
-					<a href="" class="section-footer pull-right"><span class="label label-info">Register this section</span></a>
-					<hr>
+					<a href="" class="section-footer pull-right" ng-click="registerSection(section)"><span class="label label-info">Register this section</span></a>
 				</div>
 			</div>
 			<div class="modal fade" role="dialog" id="course-description-{{key}}" aria-labelledby="courseDescriptionLabel" tabindex="-1" aria-hidden="true">

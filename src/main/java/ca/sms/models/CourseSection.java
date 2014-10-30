@@ -1,5 +1,8 @@
 package ca.sms.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,8 +19,10 @@ public class CourseSection {
 	@DBRef
 	private Professor instructor;
 	private Timeslot timeslot;
-	private String weekday;
-
+	private Weekday weekday;
+	private int size = 200;
+	private List<String> enrolledStudentsId = new ArrayList<String>();
+	
 	public String getCourseId() {
 		return courseId;
 	}
@@ -42,11 +47,26 @@ public class CourseSection {
 	public void setTimeslot(Timeslot timeslot) {
 		this.timeslot = timeslot;
 	}
-	public String getWeekday() {
+	public Weekday getWeekday() {
 		return weekday;
 	}
-	public void setWeekday(String weekday) {
+	public void setWeekday(Weekday weekday) {
 		this.weekday = weekday;
+	}
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
+	public List<String> getEnrolledStudentsId() {
+		return enrolledStudentsId;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	

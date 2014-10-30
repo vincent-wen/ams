@@ -1,6 +1,7 @@
 package ca.sms.services;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -20,7 +21,7 @@ import ca.sms.models.UserRepository;
 @Component
 public class UserService {
 	@Autowired
-	private UserRepository repos;
+	private UserRepository userRepos;
 	/**
 	 * Algorithm: SHA-256.
 	 * Salt: Random.
@@ -33,7 +34,7 @@ public class UserService {
 	
 	public boolean validate(String username, String password) {
 		try {
-			User user = repos.findByUsername(username);
+			User user = getUser(username);
 			if(isPasswordValid(user.getPassword(), password)) {
 				try {
 					AUTHORITIES.add(new SimpleGrantedAuthority(user.getRole()));
@@ -46,6 +47,7 @@ public class UserService {
 			}
 			return false;
 		}catch(NullPointerException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -54,24 +56,37 @@ public class UserService {
 		return encryptor.isPasswordValid(encryptedPassword, rawPassword, null);
 	}
 	
-	public boolean find(String username) {
-		return repos.findByUsername(username) != null;
-	}
-	
 	public void encryptPassword(User user) {
 		user.setPassword(encryptor.encodePassword(user.getPassword(), null));
 	}
 	
 	public void save(User user) {
-		repos.save(user);
+		userRepos.save(user);
 	}
 	
 	public User getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		User currentUser = repos.findByUsername(auth.getName());
-//		user.setRole(auth.getAuthorities().iterator().next().getAuthority());
-//		user.setUsername(auth.getName());
+		String userRole = getUserRole();
+		if(userRole.equals("ROLE_ANONYMOUS")) return null;
+		
+		User currentUser = userRepos.findByUsername(auth.getName());
+		currentUser.setPassword(null);
 		return currentUser;
+	}
+	
+	public String getUserRole() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Iterator<? extends GrantedAuthority> iterator = auth.getAuthorities().iterator();
+		if(iterator.hasNext()) return iterator.next().getAuthority();
+		return null;
+	}
+	
+	public User getUser(String username) {
+		return userRepos.findByUsername(username);
+	}
+	
+	public User getUser(String firstName, String lastName) {
+		return userRepos.findByFirstNameAndLastName(firstName, lastName);
 	}
 	
 	public boolean validatePasswordPattern(String password) {
@@ -88,8 +103,8 @@ public class UserService {
 		save(currentUser);
 	}
 
-	public void test() {
-		// TODO Auto-generated method stub
-		
+	public void assignUser(User user, User detailedUser) {
+		user.setDetailedUser(detailedUser);
+		userRepos.save(user);
 	}
 }

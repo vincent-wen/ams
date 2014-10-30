@@ -15,10 +15,10 @@ public class Course {
 	@Id
 	private String id;
 	private String courseId;
+	private float credits;
 	private String courseName;
 	private String courseDescription;
-	@DBRef
-	private List<Course> prerequisites = new ArrayList<Course>();
+	private List<String> prerequisiteCourseIds = new ArrayList<String>();
 	@DBRef
 	private List<CourseSection> courseSections = new ArrayList<CourseSection>();
 	
@@ -43,11 +43,17 @@ public class Course {
 	public void setCourseDescription(String courseDescription) {
 		this.courseDescription = courseDescription;
 	}
-	public List<Course> getPrerequisites() {
-		return prerequisites;
+	public List<String> getPrerequisiteCourseIds() {
+		return prerequisiteCourseIds;
 	}
 	public List<CourseSection> getCourseSections() {
 		return courseSections;
+	}
+	public float getCredits() {
+		return credits;
+	}
+	public void setCredits(float credits) {
+		this.credits = credits;
 	}	
 	
 }

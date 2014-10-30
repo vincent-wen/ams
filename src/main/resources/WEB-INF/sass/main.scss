@@ -55,10 +55,15 @@ hr { width: 100%; }
 .section-footer {
 	position: relative;
 	top: -25px;
+	span {font-size: 90%;}
 }
 
 .panel-body {
 	color: $black;
+}
+
+#my-sections {
+	margin-top: 20px;
 }
 
 // AngularJS Animation

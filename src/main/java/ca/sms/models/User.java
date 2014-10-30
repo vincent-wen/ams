@@ -2,6 +2,7 @@ package ca.sms.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,14 +10,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document
 public class User{
-	protected String username;
-	protected String password;
+	private String username;
+	private String password;
+	private String firstName;
+	private String lastName;
+	private String email;
 	@Transient
-	protected String newpassword;
-	protected String role;
+	private String newpassword;
+	private String role;
 	@Id
 	protected String id;
-	protected String email;
+	@DBRef
+	private User detailedUser;
 	
 	public String getUsername() {
 		return username;
@@ -42,11 +47,31 @@ public class User{
 	public void setNewpassword(String newpassword) {
 		this.newpassword = newpassword;
 	}
-	@Override
-	public String toString() {
-		return "User [username=" + username + ", password=" + password
-				+ ", newpassword=" + newpassword + ", role=" + role + ", id="
-				+ id + "]";
+	public String getId() {
+		return id;
 	}
-	
+	public User getDetailedUser() {
+		return detailedUser;
+	}
+	public void setDetailedUser(User detailedUser) {
+		this.detailedUser = detailedUser;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 }

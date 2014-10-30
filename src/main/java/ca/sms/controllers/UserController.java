@@ -25,17 +25,18 @@ public class UserController {
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ModelAndView loginPage() {
+		if(userService.getCurrentUser() != null) return new ModelAndView("index");
 		return new ModelAndView("login");
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> login(@RequestBody User user) {
-		if(userService.find(user.getUsername())) {
+		if(userService.getUser(user.getUsername()) != null) {
 			if(userService.validate(user.getUsername(), user.getPassword())) {
 				try {
-				HttpHeaders headers = new HttpHeaders();
-				headers.setLocation(new URI("/"));
-				return new ResponseEntity<String>("success", headers, HttpStatus.MOVED_PERMANENTLY);
+					HttpHeaders headers = new HttpHeaders();
+					headers.setLocation(new URI("/"));
+					return new ResponseEntity<String>("success", headers, HttpStatus.MOVED_PERMANENTLY);
 				}catch(URISyntaxException e) { e.printStackTrace(); }
 			}
 			return new ResponseEntity<String>("The password is not correct", HttpStatus.UNAUTHORIZED);
@@ -55,18 +56,18 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/api/change-password", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<String> changePassword(@RequestBody User user) {
+	public @ResponseBody ResponseEntity<String> changePassword(@RequestBody String newPassword, @RequestBody String oldPassword) {
 		User currentUser = userService.getCurrentUser();
-		if(!currentUser.getUsername().equals(user.getUsername())) {
+		if(currentUser == null) {
 			return new ResponseEntity<String>("Login expired", HttpStatus.FORBIDDEN);
 		}
-		if(!userService.isPasswordValid(currentUser.getPassword(), user.getPassword())) {
+		if(!userService.isPasswordValid(currentUser.getPassword(), oldPassword)) {
 			return new ResponseEntity<String>("Your old password is incorrect.", HttpStatus.NOT_ACCEPTABLE);
 		}
-		if(!userService.validatePasswordPattern(user.getNewpassword())) {
+		if(!userService.validatePasswordPattern(newPassword)) {
 			return new ResponseEntity<String>("Your new password is not acceptable.", HttpStatus.NOT_ACCEPTABLE);
 		}
-		userService.updatePassword(currentUser, user.getNewpassword());
+		userService.updatePassword(currentUser, newPassword);
 		return new ResponseEntity<String>("success", HttpStatus.OK);
 	}
 }

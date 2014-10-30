@@ -11,16 +11,14 @@ directive('navigationBar', function() {
 	}
 }).
 
-directive('changePassword', ['$http', 'userService', function($http, userService) {
+directive('changePassword', ['$http', function($http) {
 	return {
 		restrict: 'E',
 		scope: {},
 		templateUrl: '/api/partials/change-password',
 		link: function(scope, element, attrs) {
 			var form = scope.cpw_form;
-			userService.then(function(user) {
-				scope.username = user.username;
-			});
+
 			scope.changePassword = function(event) {
 				event.preventDefault();
 				setDirty(form.newpassword);
@@ -28,9 +26,8 @@ directive('changePassword', ['$http', 'userService', function($http, userService
 				setDirty(form.repeatpassword);
 				if(form.$valid) {
 					$http.post('/api/change-password', {
-						username: scope.username,
 						newpassword: form.newpassword.$viewValue,
-						password: form.oldpassword.$viewValue
+						oldpassword: form.oldpassword.$viewValue
 					}).success(function(data, status) {
 						scope.successMessage = data;
 						scope.errorMessage = '';

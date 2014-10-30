@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,13 +13,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Document
 public class Student extends User{
 	
-	private List<CourseSection> registeredSection = new ArrayList<CourseSection>();
-	private HashMap<Course, Grade> completedCourse = new HashMap<Course, Grade>();
-	public List<CourseSection> getRegisteredSection() {
-		return registeredSection;
+	private int StudentId;
+	@DBRef
+	private List<CourseSection> registeredSections = new ArrayList<CourseSection>();
+	private HashMap<String, Grade> completedCoursesId = new HashMap<String, Grade>();
+	
+	public List<CourseSection> getRegisteredSections() {
+		return registeredSections;
 	}
-	public HashMap<Course, Grade> getCompletedCourse() {
-		return completedCourse;
+	public HashMap<String, Grade> getCompletedCourseId() {
+		return completedCoursesId;
+	}
+	public int getStudentId() {
+		return StudentId;
+	}
+	public void setStudentId(int studentId) {
+		StudentId = studentId;
 	}
 	
 }
