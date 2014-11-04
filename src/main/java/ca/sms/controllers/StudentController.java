@@ -1,5 +1,7 @@
 package ca.sms.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,33 @@ public class StudentController {
 	private UserService userService;
 	@Autowired
 	private StudentService studentService;
+	
+	@RequestMapping(value="/api/student/search-by-id", method = RequestMethod.POST)
+	public @ResponseBody List<Student> searchById(@RequestBody String studentId) {
+		String role = userService.getCurrentUser().getRole();
+		if(role.matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+			return studentService.getStudentsById(studentId);
+		}
+		return null;
+	}
+	
+	@RequestMapping(value="/api/student/search-by-name", method = RequestMethod.POST)
+	public @ResponseBody List<Student> searchByName(@RequestBody String studentName) {
+		String role = userService.getCurrentUser().getRole();
+		if(role.matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+			return studentService.getStudentsByName(studentName);
+		}
+		return null;
+	}
+	
+	@RequestMapping(value="/api/student/search-all", method = RequestMethod.POST)
+	public @ResponseBody List<Student> searchAll() {
+		String role = userService.getCurrentUser().getRole();
+		if(role.matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+			return studentService.getAllStudents();
+		}
+		return null;
+	}
 	
 	@RequestMapping(value="/api/student/register-course", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> registerSection(@RequestBody String sectionId) {

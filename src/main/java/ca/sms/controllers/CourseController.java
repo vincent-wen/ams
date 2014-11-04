@@ -1,9 +1,10 @@
 package ca.sms.controllers;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,16 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import ca.sms.models.Course;
-import ca.sms.models.CourseSection;
-import ca.sms.models.Professor;
-import ca.sms.models.ProfessorRepository;
-import ca.sms.models.Student;
-import ca.sms.models.Timeslot;
-import ca.sms.models.User;
-import ca.sms.services.CourseService;
-import ca.sms.services.ProfessorService;
-import ca.sms.services.UserService;
+import ca.sms.models.*;
+import ca.sms.services.*;
 
 @Controller
 public class CourseController {
@@ -29,6 +22,8 @@ public class CourseController {
 	private CourseService courseService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private StudentService studentService;
 	@Autowired
 	private ProfessorService professorService;
 	
@@ -45,7 +40,7 @@ public class CourseController {
 	}
 	
 	@RequestMapping(value="/api/course/search-all", method = RequestMethod.POST)
-	public @ResponseBody List<Course> searchById() {
+	public @ResponseBody List<Course> searchAll() {
 		return courseService.getAllCourses();
 	}
 	
@@ -78,5 +73,20 @@ public class CourseController {
 		}
 		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
-
+	
+	@RequestMapping(value = "/api/section/get-enrolled-students", method = RequestMethod.POST)
+	public @ResponseBody List<Student> getEnrolledStudentsForSection(@RequestBody String sectionId) {
+		User user = userService.getCurrentUser();
+		if(user.getRole().matches("ROLE_PROFESSOR|ROLE_REGISTRAR|ROLE_GPD")) {
+			CourseSection section = courseService.getSectionById(sectionId);
+			List<Student> enrolledStudents = new ArrayList<Student>();
+			List<String> studentIds = section.getEnrolledStudentsId();
+			Iterator<String> iterator = studentIds.iterator();
+			while(iterator.hasNext()) {
+				enrolledStudents.add(studentService.getStudentById(iterator.next()));
+			}
+			return enrolledStudents;
+		}
+		return null;
+	}
 }

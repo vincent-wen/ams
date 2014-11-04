@@ -70,4 +70,16 @@ public class UserController {
 		userService.updatePassword(currentUser, newPassword);
 		return new ResponseEntity<String>("success", HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/api/user/edit-info", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> editInfo(@RequestBody User newUser) {
+		User currentUser = userService.getCurrentUser();
+		if(currentUser.getId() == newUser.getId()) {
+			currentUser.setEmail(newUser.getEmail());
+			currentUser.setPhoneNumber(newUser.getPhoneNumber());
+			userService.save(currentUser);
+			return new ResponseEntity<String>("success", HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+	}
 }

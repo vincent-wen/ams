@@ -30,7 +30,8 @@ public class UserService {
 	 */
 	private StrongPasswordEncoder encryptor = new StrongPasswordEncoder();
 	static final List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
-	private String passwordPattern = "^.*(?=.{6,20})(?=.*\\d)(?=.*[a-zA-Z]).*$";
+	private final static String passwordPattern = "^.*(?=.{6,20})(?=.*\\d)(?=.*[a-zA-Z]).*$";
+//	private final static String emailPattern = "[]";
 	
 	public boolean validate(String username, String password) {
 		try {
@@ -106,5 +107,9 @@ public class UserService {
 	public void assignUser(User user, User detailedUser) {
 		user.setDetailedUser(detailedUser);
 		userRepos.save(user);
+	}
+
+	public List<User> getUser(String firstName, String lastName, String role) {
+		return userRepos.findByFirstNameOrLastNameAndRoleRegex(firstName, lastName, role);
 	}
 }

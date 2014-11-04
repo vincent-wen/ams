@@ -1,5 +1,6 @@
 /home/vincent/eclipse-workspace/sms/src/main/java/ca/sms/configs/SSLCustomizer.java
 /home/vincent/eclipse-workspace/sms/src/main/java/ca/sms/models/User.java
+/home/vincent/eclipse-workspace/sms/src/main/java/ca/sms/models/Weekday.java
 /home/vincent/eclipse-workspace/sms/src/main/java/ca/sms/services/ProfessorService.java
 /home/vincent/eclipse-workspace/sms/src/main/java/ca/sms/models/CourseRepository.java
 /home/vincent/eclipse-workspace/sms/src/main/java/ca/sms/models/Registrar.java

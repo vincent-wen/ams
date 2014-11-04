@@ -19,6 +19,8 @@ public class AdminService {
 	private CourseSectionRepository sectionRepos;
 	@Autowired
 	private CourseRepository courseRepos;
+	@Autowired
+	private GPDRepository gpdRepos;
 
 	public void init() {
 		Professor professor1 = professorService.create("Dssouli");
@@ -82,6 +84,13 @@ public class AdminService {
 		Student student = studentService.create("Luheng", "Wen", 6812910, "vincent.wen77@gmail.com");
 		User user = userService.getUser("vincent");
 		userService.assignUser(user, student);
+	}
+	
+	public void createGPD() {
+		
+		GPD gpd = new GPD();
+		gpd.s
+		gpdRepos.save(entity)
 	}
 	
 }

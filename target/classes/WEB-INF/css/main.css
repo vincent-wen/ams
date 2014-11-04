@@ -67,7 +67,7 @@ hr {
 /* line 55, ../sass/main.scss */
 .section-footer {
   position: relative;
-  top: -25px;
+  padding: 0 10px;
 }
 /* line 58, ../sass/main.scss */
 .section-footer span {

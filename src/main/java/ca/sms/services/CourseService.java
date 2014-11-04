@@ -15,15 +15,16 @@ public class CourseService {
 	private CourseRepository courseRepos;
 	@Autowired
 	private TimeslotRepository timeslotRepos;
+	private final static String courseIdAndNameRegex = "[0-9A-Za-z]+";
 
 	public List<Course> getCoursesById(String courseId) {
-		if(courseId == "") return null;
+		if(!courseId.matches(courseIdAndNameRegex)) return null;
 		String regex = ".*" + courseId + ".*";
 		return courseRepos.findByCourseIdRegex(regex);
 	}
 	
 	public List<Course> getCoursesByName(String courseName) {
-		if(courseName == "") return null;
+		if(!courseName.matches(courseIdAndNameRegex)) return null;
 		String regex = ".*" + courseName + ".*";
 		return courseRepos.findByCourseNameRegex(regex);
 	}

@@ -1,6 +1,8 @@
 package ca.sms.services;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import ca.sms.models.Course;
 import ca.sms.models.CourseSection;
 import ca.sms.models.Student;
 import ca.sms.models.StudentRepository;
+import ca.sms.models.User;
 
 @Component
 public class StudentService {
@@ -17,7 +20,11 @@ public class StudentService {
 	private StudentRepository studentRepos;
 	@Autowired
 	private CourseService courseService;
+	@Autowired
+	private UserService userService;
 	private CourseSection conflictedSection;
+	private final static String studentIdRegex = "[0-9]+";
+	private final static String studentNameRegex = "[A-Za-z\\s]";
 	
 	public void registerSection(Student student, CourseSection section) {
 		student.getRegisteredSections().add(section);
@@ -89,5 +96,43 @@ public class StudentService {
 	public void dropSection(Student student, CourseSection section) {
 		student.getRegisteredSections().remove(section);
 		save(student);
+	}
+
+	public List<Student> getStudentsById(String studentId) {
+		if(studentId.matches(getStudentIdRegex())) {
+			return studentRepos.findByStudentIdRegex(Integer.parseInt(studentId));
+		}
+		return null;
+	}
+
+	public static String getStudentIdRegex() {
+		return studentIdRegex;
+	}
+
+	public List<Student> getStudentsByName(String studentName) {
+		if(studentName.matches(getStudentNameRegex())) {
+			List<User> users = userService.getUser(studentName, studentName, "ROLE_STUDENT");
+			if(users != null) {
+				Iterator<User> iterator = users.iterator();
+				List<Student> students = new ArrayList<Student>();
+				while(iterator.hasNext()) {
+					students.add((Student) iterator.next().getDetailedUser());
+				}
+				return students;
+			}
+		}
+		return null;
+	}
+
+	public List<Student> getAllStudents() {
+		return studentRepos.findAll();
+	}
+
+	public static String getStudentNameRegex() {
+		return studentNameRegex;
+	}
+	
+	public Student getStudentById(String id) {
+		return studentRepos.findOne(id);
 	}
 }
