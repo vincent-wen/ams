@@ -44,30 +44,45 @@ public class CourseController {
 		return courseService.getAllCourses();
 	}
 	
-	@RequestMapping(value="/api/course/change-section", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<String> changeSectionCapacity(@RequestBody String sectionId, 
-			@RequestBody int newCapacity, @RequestBody String newStartTime, @RequestBody String newInstructorsName) {
+	@RequestMapping(value="/api/section/change-time", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> changeTime(@RequestBody CourseSection courseSection) {
 		User user = userService.getCurrentUser();
-		if(user.getRole().equals("ROLE_REGISTRAR")) {
+		if(user.getRole() == Role.ROLE_GPD) {
 			// find objects
-			CourseSection section = courseService.getSectionById(sectionId);
-			Timeslot newTimeslot = courseService.getTimeslotByStartTime(newStartTime);
-			Professor newInstructor = professorService.getProfessorByName(newInstructorsName);
-			
+			CourseSection section = courseService.getSectionById(courseSection.getId());
+			Timeslot newTimeslot = courseService.getTimeslotByStartTimeAndEndTime(courseSection.getTimeslot().getStartTime().trim(), courseSection.getTimeslot().getEndTime().trim());
+			Weekday weekday = courseSection.getWeekday();
+
 			// Handle exceptions before modifications
 			if(section == null)
 				return new ResponseEntity<String>("Section not found.", HttpStatus.NOT_FOUND);
-			if(section.getSize() > newCapacity) 
-				return new ResponseEntity<String>("It only allows to expand section's capacity.", HttpStatus.NOT_ACCEPTABLE);
 			if(newTimeslot == null)
-				return new ResponseEntity<String>("New timeslot is not valid.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("The timeslot is not found.", HttpStatus.NOT_ACCEPTABLE);
+			if(weekday == null)
+				return new ResponseEntity<String>("The weekday is not valid.", HttpStatus.NOT_ACCEPTABLE);
+			
+			// Process modifications
+			section.setTimeslot(newTimeslot);
+			section.setWeekday(weekday);
+			courseService.save(section);
+			return new ResponseEntity<String>("success", HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value="/api/section/change-instructor", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> changeInstructor(@RequestBody CourseSection courseSection) {
+		User user = userService.getCurrentUser();
+		if(user.getRole() == Role.ROLE_GPD) {
+			CourseSection section = courseService.getSectionById(courseSection.getId());
+			Professor newInstructor = professorService.getProfessorById(courseSection.getInstructor().getId());
+			
+			if(section == null)
+				return new ResponseEntity<String>("Section not found.", HttpStatus.NOT_FOUND);
 			if(newInstructor == null)
 				return new ResponseEntity<String>("Professor not found.", HttpStatus.NOT_FOUND);
 			
-			// Process modifications
-			section.setSize(newCapacity);
-			section.setTimeslot(newTimeslot);
-			section.setInstructor(newInstructor);
+			section.setInstructor(courseSection.getInstructor());
 			courseService.save(section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
@@ -77,13 +92,15 @@ public class CourseController {
 	@RequestMapping(value = "/api/section/get-enrolled-students", method = RequestMethod.POST)
 	public @ResponseBody List<Student> getEnrolledStudentsForSection(@RequestBody String sectionId) {
 		User user = userService.getCurrentUser();
-		if(user.getRole().matches("ROLE_PROFESSOR|ROLE_REGISTRAR|ROLE_GPD")) {
+		if(user.getRole().toString().matches("ROLE_PROFESSOR|ROLE_REGISTRAR|ROLE_GPD")) {
 			CourseSection section = courseService.getSectionById(sectionId);
 			List<Student> enrolledStudents = new ArrayList<Student>();
 			List<String> studentIds = section.getEnrolledStudentsId();
 			Iterator<String> iterator = studentIds.iterator();
 			while(iterator.hasNext()) {
-				enrolledStudents.add(studentService.getStudentById(iterator.next()));
+				Student student = studentService.getStudentById(iterator.next());
+				student.setPassword(null);
+				enrolledStudents.add(student);
 			}
 			return enrolledStudents;
 		}

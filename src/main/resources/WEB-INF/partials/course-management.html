@@ -1,5 +1,5 @@
 <div ng-controller="CourseCtrl">
-	<div class="input-group" >
+	<div class="input-group margin-bottom" >
 		<input type="text" class="form-control" placeholder="Input course name or id" ng-model="courseNameorId">
 
 		<!-- Search Bar -->
@@ -17,12 +17,12 @@
 	<!-- Search Results -->
 	<div class="panel-group" id="search-result">
 		<div class="alert alert-danger" role="alert" ng-show="courses.length == 0">No course is found. Please try again.</div>
-		<div class="panel panel-info" ng-repeat="(key, course) in courses">
+		<div class="panel panel-success" ng-repeat="(key, course) in courses">
 			<div class="panel-heading">
 				<div class="panel-title">
 					<h4>{{course.courseId}} - {{course.courseName}}</h4>
 					<footer class="text-right">
-						<a href="" data-toggle="modal" data-target="#course-description-{{key}}" data-backdrop="static">
+						<a href="" ng-click="showCourseDescription(course)">
 							<span class="label label-default">Course Description</span>
 						</a>
 						<a href="" data-toggle="collapse" data-target="#collapse-{{key}}">
@@ -32,32 +32,106 @@
 				</div>
 			</div>
 			<div id="collapse-{{key}}" class="panel-collapse collapse">
-				<div class="panel-body" ng-repeat="section in course.courseSections">
+				<div class="panel-body" ng-repeat="(id, section) in course.courseSections">
 					<div>
-						<p>Time: {{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</p>
-						<p>Instructor: Dr. {{section.instructor.username}}</p>
-						<p>Location: {{section.location}}</p>
+						<div ng-init="timeMode[key][id] = false">Time: 
+							<span ng-hide="timeMode[key][id]">{{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</span>
+							<span class="section-edit" ng-show="timeMode[key][id]">
+								<input type="time" class="form-control input-sm" name="startTime" ng-value="section.timeslot.startTime"> -
+								<input type="time" class="form-control input-sm" name="endTime" ng-value="section.timeslot.endTime"> on 
+								<select class="form-control input-sm">
+									<option ng-repeat="weekday in weekdays" ng-selected="weekday == section.weekday">{{weekday}}</option>
+								</select>
+								<span class="btn-group">
+									<button class="btn btn-link" type="button" ng-click="changeTime($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('timeMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+								</span>
+							</span>
+							<a href="" ng-click="switchMode('timeMode', key, id)" ng-hide="timeMode[key][id] || user().role == 'Student'"><span class="glyphicon glyphicon-pencil"></span></a>
+							<div class="text-danger" ng-show="timeMode[key][id]"></div>
+						</div>
+						<div ng-init="instructorMode[key][id] = false">Instructor: Dr. 
+							<span ng-hide="instructorMode[key][id]">{{section.instructor.name}}</span>
+							<span class="section-edit dropdown" ng-show="instructorMode[key][id]">
+								<input type="text" id="professor_input" class="form-control input-sm dropdown-toggle" name="instructor" data-toggle="dropdown" ng-focus="displayProfessors()" ng-model="instructor[key][id]" ng-init="instructor[key][id] = section.instructor.name">
+								<ul class="dropdown-menu" id="professors_list" role="menu" aria-labelledby="professor_input">
+									<li role="presentation" ng-repeat="professor in professors() | filter: instructor[key][id]: false" ng-click="chooseProfessor(professor.name, key, id)"><a role="menuitem" tabindex="-1" href="">{{professor.name}}</a></li>
+								</ul>
+								<span class="btn-group">
+									<button class="btn btn-link" type="button" ng-click="changeInstructor(key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('instructorMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+								</span>
+							</span>
+							<a href="" ng-click="switchMode('instructorMode', key, id)" ng-hide="instructorMode[key][id] || user().role == 'Student'"><span class="glyphicon glyphicon-pencil"></span>
+							<div class="text-danger" ng-show="timeMode[key][id]"></div>
+						</div>
+						<div ng-init="locationMode[key][id] = false">Location: 
+							<span ng-hide="locationMode[key][id]">{{section.location}}</span>
+							<span class="section-edit" ng-show="locationMode[key][id]">
+								<input type="time" class="form-control input-sm" name="location" ng-value="section.location">
+								<span class="btn-group">
+									<button class="btn btn-link" type="button" ng-click="changeLocation()"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('locationMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+								</span>
+							</span>
+							<a href="" ng-click="switchMode('locationMode', key, id)" ng-hide="locationMode[key][id] || user().role == 'Student'"><span class="glyphicon glyphicon-pencil"></span>
+							<div class="text-danger" ng-show="timeMode[key][id]"></div>
+						</div>
 					</div>
-					<a href="" class="section-footer pull-right" ng-click="registerSection(section)"><span class="label label-info">Register this section</span></a>
-					<a href="" class="section-footer pull-right" ng-click="showEnrolledStudents(section)"><span class="label label-info">Show enrolled students</span></a>
+					<a href="" class="section-footer pull-right" ng-click="registerSection(section)" ng-show="user().role == 'Student'"><span class="label label-info">Register</span></a>
+					<a href="" class="section-footer pull-right" ng-click="showEnrolledStudents(section)" ng-hide="user().role == 'Student'"><span class="label label-warning">Show enrolled students</span></a>
 				</div>
 			</div>
-			<div class="modal fade" role="dialog" id="course-description-{{key}}" aria-labelledby="courseDescriptionLabel" tabindex="-1" aria-hidden="true">
-				<div class="modal-dialog modal-lg">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-							<h4>Course Description</h4>
-						</div>
-						<div class="modal-body">
-							<p><span class="text-grey">Prerequistes: </span>{{course.prerequistes || "None"}}</p>
-							<p class="text-grey">Desiption:</p>
-							<p>{{course.courseDescription || "None"}}</p>
-						</div>
-						<div class="modal-footer">
-							<button class="btn btn-default" data-dismiss="modal">Close</button>
-						</div>
-					</div>
+		</div>
+	</div>
+	<div class="modal fade" role="dialog" id="course-description" aria-labelledby="courseDescriptionLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4>Course Description</h4>
+				</div>
+				<div class="modal-body">
+					<p><span class="text-grey">Prerequistes: </span>{{currentCourse.prerequistes || "None"}}</p>
+					<p class="text-grey">Desiption:</p>
+					<p>{{currentCourse.courseDescription || "None"}}</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" role="dialog" id="enrolled-students" aria-labelledby="showEnrolledStudentsLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<table class="table">
+						<h4>Enrolled Students List</h4>
+						<tr class="warning">
+							<th>Student ID</th>
+							<th>Student Name</th>
+							<th>Email</th>
+							<th>Program</th>
+							<th></th>
+						</tr>
+						<tr ng-repeat="student in enrolledStudents">
+							<td>{{student.studentId}}</td>
+							<td>{{student.name}}</td>
+							<td>{{student.email}}</td>
+							<td>{{student.program}}</td>
+							<td>
+								<a href="" data-toggle="modal" data-target="#student-details" data-backdrop="static">
+									<span class="label label-default">View details</span>
+								</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>

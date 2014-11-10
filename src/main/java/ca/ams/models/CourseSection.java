@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class CourseSection {
 	@Id
 	private String id;
+	private String courseObjectId;
+	@Transient
 	private String courseId;
 	private String location;
 	@DBRef
@@ -23,11 +26,11 @@ public class CourseSection {
 	private int size = 200;
 	private List<String> enrolledStudentsId = new ArrayList<String>();
 	
-	public String getCourseId() {
-		return courseId;
+	public String getCourseObjectId() {
+		return courseObjectId;
 	}
-	public void setCourseId(String courseId) {
-		this.courseId = courseId;
+	public void setCourseObjectId(String courseObjectId) {
+		this.courseObjectId = courseObjectId;
 	}
 	public String getLocation() {
 		return location;
@@ -68,6 +71,33 @@ public class CourseSection {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	
+	public String getCourseId() {
+		return courseId;
+	}
+	public void setCourseId(String courseId) {
+		this.courseId = courseId;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CourseSection other = (CourseSection) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
 }

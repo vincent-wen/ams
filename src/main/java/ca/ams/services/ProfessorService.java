@@ -1,11 +1,13 @@
 package ca.ams.services;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ca.ams.models.Professor;
 import ca.ams.models.ProfessorRepository;
-import ca.ams.models.User;
 
 @Component
 public class ProfessorService {
@@ -24,10 +26,24 @@ public class ProfessorService {
 		return professorRepos.save(professor);
 	}
 	
-	public Professor getProfessorByName(String name) {
-		String[] names = name.trim().split(" ");
-		User user = userService.getUser(names[0], names[1]);
-		if(user == null) return null;
-		return (Professor) user.getDetailedUser();
+	public List<Professor> getProfessorByName(String name) {
+		List<Professor> professors = getProfessor(name);
+		Iterator<Professor> iterator = professors.iterator();
+		while(iterator.hasNext()) {
+			iterator.next().setPassword(null);
+		}
+		return professors;
+	}
+
+	public List<Professor> getProfessor(String name) {
+		return professorRepos.findByNameRegex(name);
+	}
+
+	public Professor getProfessorById(String instructorId) {
+		return instructorId == null ? null:professorRepos.findOne(instructorId);
+	}
+
+	public List<Professor> getAllProfessors() {
+		return professorRepos.findAll();
 	}
 }

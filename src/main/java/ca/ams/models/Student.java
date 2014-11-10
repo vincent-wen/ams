@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Student extends User{
 	
 	private int studentId;
+	private String program;
 	@DBRef
 	private List<CourseSection> registeredSections = new ArrayList<CourseSection>();
 	private HashMap<String, Grade> completedCoursesId = new HashMap<String, Grade>();
@@ -29,6 +30,12 @@ public class Student extends User{
 	}
 	public void setStudentId(int studentId) {
 		this.studentId = studentId;
+	}
+	public String getProgram() {
+		return program;
+	}
+	public void setProgram(String program) {
+		this.program = program;
 	}
 	
 }

@@ -1,1 +1,57 @@
-student management
+<div ng-controller="StudentCtrl" ng-hide="user().role == 'Student'">
+	<div class="input-group margin-bottom" >
+		<input type="text" class="form-control" placeholder="Input student name or id" ng-model="studentNameorId">
+
+		<!-- Search Bar -->
+		<div class="input-group-btn">
+			<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">Search <span class="caret"></span></button>
+			<ul class="dropdown-menu dropdown-menu-right" role="menu">
+				<li><a href="" ng-click="searchById()">Search Student by Id</a></li>
+				<li><a href="" ng-click="searchByName()">Search Student by Name</a></li>
+				<li class="divider"></li>
+				<li><a href="" ng-click="searchAll()">Search All Students</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Search Results -->
+	<div class="panel-group" id="search-result">
+		<div class="alert alert-danger" role="alert" ng-show="students.length == 0">No student is found. Please try again.</div>
+		
+		<table class="table table-hover" ng-show="students.length > 0">
+			<tr>
+				<td>Student ID</td>
+				<td>Name</td>
+				<td>Email</td>
+				<td>Program</td>
+				<td></td>
+			</tr>
+			<tr ng-repeat="(key, student) in students">
+				<td>{{student.studentId}}</td>
+				<td>{{student.name}}</td>
+				<td>{{student.email}}</td>
+				<td>{{student.program}}</td>
+				<td>
+					<a href="" ng-click="showStudentDetails(student)" ><span class="label label-default">View details</span></a>
+				</td>
+			</tr>
+		</table>	
+	</div>
+
+	<div class="modal fade" role="dialog" id="student-details" aria-labelledby="studentDetailsLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4>Student Details</h4>
+				</div>
+				<div class="modal-body">
+					{{chosenStudent.name}}
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

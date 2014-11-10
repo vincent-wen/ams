@@ -30,10 +30,8 @@ public class AppController {
 	}
 	
 	@RequestMapping("/init")
-	public ModelAndView forTest() {
-//		adminService.init();
-//		adminService.createStudent();
-		adminService.createGPD();
-		return new ModelAndView("index");
+	public String forTest() {
+		adminService.init();
+		return "redirect:/login";
 	}
 }

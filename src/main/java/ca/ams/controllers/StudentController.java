@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ca.ams.models.CourseSection;
+import ca.ams.models.Role;
 import ca.ams.models.Student;
 import ca.ams.models.User;
 import ca.ams.services.CourseService;
@@ -29,8 +30,8 @@ public class StudentController {
 	
 	@RequestMapping(value="/api/student/search-by-id", method = RequestMethod.POST)
 	public @ResponseBody List<Student> searchById(@RequestBody String studentId) {
-		String role = userService.getCurrentUser().getRole();
-		if(role.matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+		Role role = userService.getCurrentUser().getRole();
+		if(role.toString().matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
 			return studentService.getStudentsById(studentId);
 		}
 		return null;
@@ -38,8 +39,8 @@ public class StudentController {
 	
 	@RequestMapping(value="/api/student/search-by-name", method = RequestMethod.POST)
 	public @ResponseBody List<Student> searchByName(@RequestBody String studentName) {
-		String role = userService.getCurrentUser().getRole();
-		if(role.matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+		Role role = userService.getCurrentUser().getRole();
+		if(role.toString().matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
 			return studentService.getStudentsByName(studentName);
 		}
 		return null;
@@ -47,8 +48,8 @@ public class StudentController {
 	
 	@RequestMapping(value="/api/student/search-all", method = RequestMethod.POST)
 	public @ResponseBody List<Student> searchAll() {
-		String role = userService.getCurrentUser().getRole();
-		if(role.matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+		Role role = userService.getCurrentUser().getRole();
+		if(role.toString().matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
 			return studentService.getAllStudents();
 		}
 		return null;
@@ -57,10 +58,10 @@ public class StudentController {
 	@RequestMapping(value="/api/student/register-course", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> registerSection(@RequestBody String sectionId) {
 		User user = userService.getCurrentUser();
-		if(user.getRole().equals("ROLE_STUDENT")) {
+		if(user.getRole() == Role.ROLE_STUDENT) {
 			CourseSection section = courseService.getSectionById(sectionId);
-			Student student = (Student) user.getDetailedUser();
-			if(studentService.ifSectionsConflict(student, section))
+			Student student = (Student) user;
+			if(studentService.ifSectionsConflict(student, section, false))
 				return new ResponseEntity<String>("Time is conflict with another course.", HttpStatus.CONFLICT);
 			if(studentService.ifCourseAlreadyRegistered(student, section))
 				return new ResponseEntity<String>("You can not register for the same course twice within the same semester.", HttpStatus.CONFLICT);
@@ -68,14 +69,11 @@ public class StudentController {
 				return new ResponseEntity<String>("This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyCompleted(student, section))
 				return new ResponseEntity<String>("This course has already been completed.", HttpStatus.NOT_ACCEPTABLE);
-			if(studentService.ifPrerequsitesFulfilled(student, section))
+			if(!studentService.ifPrerequsitesFulfilled(student, section))
 				return new ResponseEntity<String>("You haven't fulfill the prerequisites of the course.", HttpStatus.NOT_ACCEPTABLE);
 
 			studentService.registerSection(student, section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
-		}
-		if(user.getRole().equals("ROLE_REGISTRAR")) {
-			// Do something
 		}
 		return new ResponseEntity<String>("failed", HttpStatus.NOT_FOUND);
 	}
@@ -83,27 +81,32 @@ public class StudentController {
 	@RequestMapping(value="/api/student/drop-course", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> dropCourse(@RequestBody String sectionId) {
 		User user = userService.getCurrentUser();
-		if(user.getRole().equals("ROLE_STUDENT")) {
-			Student student = (Student) user.getDetailedUser();
+		if(user.getRole() == Role.ROLE_STUDENT) {
+			Student student = (Student) user;
 			CourseSection section = courseService.getSectionById(sectionId);
 			studentService.dropSection(student, section);
-				return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("failed", HttpStatus.NOT_FOUND);
+		return new ResponseEntity<String>("Forbidden request.", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/change-section", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> changeSection(@RequestBody String sectionId) {
 		User user = userService.getCurrentUser();
-		if(user.getRole().equals("ROLE_STUDENT")) {
+		if(user.getRole() == Role.ROLE_STUDENT) {
 			CourseSection section = courseService.getSectionById(sectionId);
-			Student student = (Student) user.getDetailedUser();
-			if(studentService.changeSection(student, section))
-				return new ResponseEntity<String>("success", HttpStatus.OK);
+			Student student = (Student) user;
+			if(studentService.ifSectionAlreadyRegistered(student, section))
+				return new ResponseEntity<String>("You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
+			if(studentService.ifSectionsConflict(student, section, true))
+				return new ResponseEntity<String>("Time is conflict with another course.", HttpStatus.CONFLICT);
+			if(courseService.isSectionFull(section))
+				return new ResponseEntity<String>("This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
+			if(!studentService.ifCourseAlreadyRegistered(student, section))
+				return new ResponseEntity<String>("You have not registered this course.", HttpStatus.NOT_ACCEPTABLE);
+			studentService.changeSection(student, section);
+			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
-		if(user.getRole().equals("ROLE_REGISTRAR")) {
-			// Do something
-		}
-		return new ResponseEntity<String>("failed", HttpStatus.NOT_FOUND);
+		return new ResponseEntity<String>("Forbidden request.", HttpStatus.NOT_ACCEPTABLE);
 	}
 }

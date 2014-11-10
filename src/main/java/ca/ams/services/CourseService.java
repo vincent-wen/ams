@@ -45,16 +45,16 @@ public class CourseService {
 		courseRepos.save(course);
 	}
 
-	public Course getCourseById(String courseId) {
-		return courseRepos.findOne(courseId);
+	public Course getCourseById(String Id) {
+		return courseRepos.findOne(Id);
 	}
 
 	public boolean isSectionFull(CourseSection section) {
 		return section.getEnrolledStudentsId().size() == section.getSize();
 	}
 
-	public Timeslot getTimeslotByStartTime(String startTime) {
-		return timeslotRepos.findByStartTime(startTime);
+	public Timeslot getTimeslotByStartTimeAndEndTime(String startTime, String endTime) {
+		return timeslotRepos.findByStartTimeAndEndTime(startTime, endTime);
 	}
 	
 }

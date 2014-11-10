@@ -23,13 +23,9 @@ angular.module('login', ['ngAnimate'])
 		setDirty(form.username);
 		setDirty(form.password);
 		if(form.$valid) {
-			$http({
-				method: 'POST',
-				url: '/login',
-				data: {
-					username: form.username.$viewValue,
-					password: form.password.$viewValue
-				}
+			$http.post('/login',{
+				username: form.username.$viewValue,
+				password: form.password.$viewValue
 			})
 			.success(function(data, status) {
 				$scope.errorMessage = '';

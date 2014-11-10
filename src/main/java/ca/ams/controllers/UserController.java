@@ -2,6 +2,8 @@ package ca.ams.controllers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,14 +16,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import ca.ams.models.User;
-import ca.ams.services.UserService;
+import ca.ams.models.*;
+import ca.ams.services.*;
 
 @Controller
 public class UserController {
-
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private ProfessorService professorService;
+	@Autowired
+	private CourseService courseService;
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ModelAndView loginPage() {
@@ -30,9 +35,11 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<String> login(@RequestBody User user) {
-		if(userService.getUser(user.getUsername()) != null) {
-			if(userService.validate(user.getUsername(), user.getPassword())) {
+	public @ResponseBody ResponseEntity<String> login(@RequestBody User requestUser) {
+		User user = userService.getUser(requestUser.getUsername());
+		if(user != null) {
+			if(userService.isPasswordValid(user.getPassword(), requestUser.getPassword())) {
+				userService.loginProceed(user);
 				try {
 					HttpHeaders headers = new HttpHeaders();
 					headers.setLocation(new URI("/"));
@@ -52,12 +59,26 @@ public class UserController {
 	
 	@RequestMapping(value = "/api/get-current-user", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<User> getCurrentUser() {
-		return new ResponseEntity<User>(userService.getCurrentUser(), HttpStatus.OK);
+		User user = userService.getCurrentUser();
+		user.setPassword(null);
+		if(user.getRole() == Role.ROLE_STUDENT) {
+			Student student = (Student) user;
+			Iterator<CourseSection> sections = student.getRegisteredSections().iterator();
+			while(sections.hasNext()) {
+				CourseSection section = sections.next();
+				String id = section.getCourseObjectId();
+				section.setCourseId(courseService.getCourseById(id).getCourseId());
+			}
+		}
+		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/api/change-password", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<String> changePassword(@RequestBody String newPassword, @RequestBody String oldPassword) {
+	public @ResponseBody ResponseEntity<String> changePassword(@RequestBody User requestUser) {
+		String newPassword = requestUser.getNewpassword();
+		String oldPassword = requestUser.getPassword();
 		User currentUser = userService.getCurrentUser();
+		
 		if(currentUser == null) {
 			return new ResponseEntity<String>("Login expired", HttpStatus.FORBIDDEN);
 		}
@@ -71,15 +92,33 @@ public class UserController {
 		return new ResponseEntity<String>("success", HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/api/user/edit-info", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<String> editInfo(@RequestBody User newUser) {
+	@RequestMapping(value = "/api/user/change-phone-number", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> changePhoneNumber(@RequestBody String phoneNumber) {
 		User currentUser = userService.getCurrentUser();
-		if(currentUser.getId() == newUser.getId()) {
-			currentUser.setEmail(newUser.getEmail());
-			currentUser.setPhoneNumber(newUser.getPhoneNumber());
-			userService.save(currentUser);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+		if(!userService.validatePhoneNumber(phoneNumber))
+			return new ResponseEntity<String>("The format of your phone number is invalid.", HttpStatus.NOT_ACCEPTABLE);;
+		currentUser.setPhoneNumber(phoneNumber);
+		userService.save(currentUser);
+		return new ResponseEntity<String>("success", HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/api/user/change-email", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> changeEmail(@RequestBody String email) {
+		User currentUser = userService.getCurrentUser();
+		if(!userService.validateEmail(email))
+			return new ResponseEntity<String>("The format of your email is invalid", HttpStatus.NOT_ACCEPTABLE);;
+		currentUser.setEmail(email);;
+		userService.save(currentUser);
+		return new ResponseEntity<String>("success", HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/api/user/get-all-professors", method = RequestMethod.POST)
+	public @ResponseBody List<Professor> getAllProfessors() {
+		User currentUser = userService.getCurrentUser();
+		if(currentUser.getRole() == Role.ROLE_GPD) {
+			List<Professor> professors = professorService.getAllProfessors();
+			return professors;
 		}
-		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+		return null;
 	}
 }

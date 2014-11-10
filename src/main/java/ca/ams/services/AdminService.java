@@ -1,5 +1,8 @@
 package ca.ams.services;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +13,6 @@ public class AdminService {
 	@Autowired
 	private UserService userService;
 	@Autowired
-	private ProfessorService professorService;
-	@Autowired
-	private StudentService studentService;
-	@Autowired
 	private TimeslotRepository timeslotRepos;
 	@Autowired
 	private CourseSectionRepository sectionRepos;
@@ -21,16 +20,26 @@ public class AdminService {
 	private CourseRepository courseRepos;
 	@Autowired
 	private GPDRepository gpdRepos;
+	@Autowired
+	private StudentRepository studentRepos;
+	@Autowired
+	private ProfessorRepository professorRepos;
+	@Autowired
+	private RegistrarRepository registrarRepos;
 
 	public void init() {
-		Professor professor1 = professorService.create("Dssouli");
-		Professor professor2 = professorService.create("Peter");
-		Professor professor3 = professorService.create("Greb");
+		if(!studentRepos.findAll().isEmpty()) return;
+		Professor professor1 = createProfessor1();
+		Professor professor2 = createProfessor2();
+		Professor professor3 = createProfessor3();
+		createStudent1();
+		createGPD1();
 		
 		Timeslot timeslot1 = new Timeslot();
 		timeslot1.setStartTime("17:45");
 		timeslot1.setEndTime("20:15");
 		timeslotRepos.save(timeslot1);
+		
 		Timeslot timeslot2 = new Timeslot();
 		timeslot2.setStartTime("15:00");
 		timeslot2.setEndTime("17:30");
@@ -72,36 +81,82 @@ public class AdminService {
 		course2.getCourseSections().add(section3);
 		course2 = courseRepos.save(course2);
 		
-		section1.setCourseId(course1.getId());
-		section2.setCourseId(course1.getId());
-		section3.setCourseId(course2.getId());
+		section1.setCourseObjectId(course1.getId());
+		section2.setCourseObjectId(course1.getId());
+		section3.setCourseObjectId(course2.getId());
 		sectionRepos.save(section1);
 		sectionRepos.save(section2);
 		sectionRepos.save(section3);
 	}
 
-	public void createStudent() {
-		Student student = studentService.create("Luheng", "Wen", 6812910, "vincent.wen77@gmail.com");
-		User user = userService.getUser("vincent");
-		userService.assignUser(user, student);
+	public Student createStudent1() {
+		Student student = new Student();
+		student.setUsername("vincent");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("vincent.wen77@gmail.com");
+		student.setStudentId(6812910);
+		student.setProgram("Software Engineering");
+		student.setName("Luheng Wen");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-8435");
+		return studentRepos.save(student);
 	}
 	
-	public void createGPD() {
-		User user = new User();
-		user.setFirstName("Dhrubajyoti");
-		user.setLastName("Goswami");
-		user.setUsername("goswami");
-		user.setPassword("111111a");
-		userService.encryptPassword(user);
-		user.setEmail("goswami@cs.concordia.ca");
-		user.setPhoneNumber("514-848-2424; ext. 7882");
-		user.setRole("ROLE_GPD");
-		
+	public GPD createGPD1() {
 		GPD gpd = new GPD();
-		gpd = gpdRepos.save(gpd);
-		
-		user.setDetailedUser(gpd);
-		userService.save(user);
+		gpd.setUsername("goswami");
+		gpd.setPassword("111111a");
+		userService.encryptPassword(gpd);
+		gpd.setName("Dhrubajyoti Goswami");
+		gpd.setEmail("goswami@cs.concordia.ca");
+		gpd.setPhoneNumber("514-848-2424 ext. 7882");
+		gpd.setRole(Role.ROLE_GPD);
+		return gpdRepos.save(gpd);
+	}
+	
+	public Professor createProfessor1() {
+		Professor professor = new Professor();
+		professor.setName("Rachida Dssouli");
+		professor.setPassword("111111a");
+		userService.encryptPassword(professor);
+		professor.setUsername("dssouli");
+		professor.setEmail("rachida.dssouli@concordia.ca");
+		professor.setRole(Role.ROLE_PROFESSOR);
+		professor.setPhoneNumber("514-848-2424 ext. 4162");
+		return professorRepos.save(professor);
+	}
+	
+	public Professor createProfessor2() {
+		Professor professor = new Professor();
+		professor.setName("Gregory Butler");
+		professor.setPassword("111111a");
+		userService.encryptPassword(professor);
+		professor.setUsername("gregb");
+		professor.setEmail("gregb@cs.concordia.ca");
+		professor.setRole(Role.ROLE_PROFESSOR);
+		professor.setPhoneNumber("514-848-2424 ext. 3031");
+		return professorRepos.save(professor);
+	}
+	
+	public Professor createProfessor3() {
+		Professor professor = new Professor();
+		professor.setName("Peter C. Rigby");
+		professor.setPassword("111111a");
+		userService.encryptPassword(professor);
+		professor.setUsername("peter");
+		professor.setEmail("peter.rigby@concordia.ca ");
+		professor.setRole(Role.ROLE_PROFESSOR);
+		return professorRepos.save(professor);
+	}
+
+	public void test() {
+		List<Student> students = studentRepos.findByNameRegex("lu");
+		if(students.isEmpty()) System.out.println("it's null");
+		Iterator<Student> iterator = students.iterator();
+		while(iterator.hasNext()) {
+			System.out.println(iterator.next().getUsername());
+		}
 	}
 	
 }

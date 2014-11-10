@@ -2,7 +2,6 @@ package ca.ams.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,19 +9,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document
 public class User{
-	private String username;
-	private String password;
-	private String firstName;
-	private String lastName;
-	private String email;
-	private String phoneNumber;
+	protected String username;
+	protected String password;
+	private String name;
+	protected String email;
+	protected String phoneNumber;
 	@Transient
 	private String newpassword;
-	private String role;
+	private Role role;
 	@Id
 	protected String id;
-	@DBRef
-	private User detailedUser;
 	
 	public String getUsername() {
 		return username;
@@ -36,10 +32,10 @@ public class User{
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getRole() {
+	public Role getRole() {
 		return role;
 	}
-	public void setRole(String role) {
+	public void setRole(Role role) {
 		this.role = role;
 	}
 	public String getNewpassword() {
@@ -50,24 +46,6 @@ public class User{
 	}
 	public String getId() {
 		return id;
-	}
-	public User getDetailedUser() {
-		return detailedUser;
-	}
-	public void setDetailedUser(User detailedUser) {
-		this.detailedUser = detailedUser;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 	public String getEmail() {
 		return email;
@@ -80,5 +58,11 @@ public class User{
 	}
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 }

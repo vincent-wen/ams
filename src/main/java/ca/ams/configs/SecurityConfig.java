@@ -24,6 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
          		.antMatchers(HttpMethod.GET, "/bower_components/**").permitAll()
          		.antMatchers(HttpMethod.GET, "/init").permitAll()
          		.antMatchers(HttpMethod.GET, "/login").permitAll()
+         		.antMatchers(HttpMethod.GET, "/init").permitAll()
          		.anyRequest().authenticated()
          		.and()
             .logout()                                    

@@ -1,25 +1,102 @@
 <div ng-controller="profileCtrl">
-	<h3>{{role}} Information</h3>
+	<h3>My Profile</h3>
 	<ul class="list-group">
-		<li class="list-group-item">First Name: {{user.detailedUser.firstName}}</li>
-		<li class="list-group-item">LastName: {{user.detailedUser.lastName}}</li>
-		<li class="list-group-item">Email: {{user.detailedUser.email}}</li>
-		<li class="list-group-item">Student ID: {{user.detailedUser.studentId}}</li>
-		<li class="list-group-item">Current Course Sections: 
-			<table class="table table-hover" id="my-sections">
-			  <tr>
-			  	<td>Course ID</td>
-			  	<td>Timeslot</td>
-			  	<td>Weekday</td>
-			  	<td>Instructor</td>
-			  </tr>
-			  <tr ng-repeat="section in user.detailedUser.registeredSections">
-			  	<td>{{sectioin.courseId}}</td>
-			  	<td>{{section.timeslot.startTime}} - {{section.timeslot.endTime}}</td>
-			  	<td>{{section.weekday}}</td>
-			  	<td>{{section.instructor.username}}</td>
-			  </tr>
-			</table>
+		<li class="list-group-item">Name: {{user().name}}</li>
+		<li class="list-group-item">Role: {{user().role}}</li>
+		<li class="list-group-item" ng-show="user().role == 'Student'">Student ID: {{user().studentId}}</li>
+		<li class="list-group-item" ng-show="user().role == 'Student'">Program: {{user().program}}</li>
+		<li class="list-group-item">
+			<span>Phone number: </span>
+			<span ng-hide="editPhoneNumberMode">{{user().phoneNumber}}</span>
+			<span class="list-edit" ng-show="editPhoneNumberMode">
+				<span class="input-group input-group-sm">
+					<input type="text" class="form-control" name="phoneNumber" ng-model="phoneNumber">
+					<span class="input-group-btn">
+						<button class="btn btn-info" type="button" ng-click="changePhoneNumber()">save</button>
+						<button class="btn btn-default" type="button" ng-click="switchEditMode('editPhoneNumberMode')"><span class="glyphicon glyphicon-remove"></span></button>
+					</span>
+				</span>
+				<span class="text-danger">{{phoneNumberError}}</span>
+			</span>
+			<a href="" ng-click="switchEditMode('editPhoneNumberMode')" ng-hide="editPhoneNumberMode"><span class="glyphicon glyphicon-pencil"></span></a>
+		</li>
+		<li class="list-group-item">
+			<span>Email: </span>
+			<span ng-hide="editEmailMode">{{user().email}}</span>
+			<span class="list-edit" ng-show="editEmailMode">
+				<span class="input-group input-group-sm">
+					<input type="text" class="form-control" name="email" ng-model="email">
+					<span class="input-group-btn">
+						<button class="btn btn-info" type="button" ng-click="changeEmail()">save</button>
+						<button class="btn btn-default" type="button" ng-click="switchEditMode('editEmailMode')"><span class="glyphicon glyphicon-remove"></span></button>
+					</span>
+				</span>
+				<span class="text-danger">{{emailError}}</span>
+			</span>
+			<a href="" ng-click="switchEditMode('editEmailMode')" ng-hide="editEmailMode"><span class="glyphicon glyphicon-pencil"></span></a>
 		</li>
 	</ul>
+	<div class="panel panel-info" ng-show="user().role == 'Student'">
+		<div class="panel-heading">Current Course Sections:</div>
+		<table class="table table-hover" id="my-sections">
+			<tr>
+				<th>Course ID</th>
+				<th>Timeslot</th>
+				<th>Weekday</th>
+				<th>Instructor</th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="section in user().registeredSections">
+				<td>{{section.courseId}}</td>
+				<td>{{section.timeslot.startTime}} - {{section.timeslot.endTime}}</td>
+				<td>{{section.weekday}}</td>
+				<td>{{section.instructor.name}}</td>
+				<td>
+				<a href="" ng-click="displaySections(section.courseId)" ><span class="label label-primary">Change section</span></a>
+				<a href="" ng-click="dropCourseRequest(section)" ><span class="label label-danger">Drop course</span></a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="modal fade" role="dialog" id="display-sections" aria-labelledby="displaySectionsLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4>Select a new course Section</h4>
+					<div class="text-danger">{{changeSectionError}}</div>
+					<div class="list-group">
+						<a href="" class="list-group-item" ng-click="chooseSection($event, section)" ng-repeat="section in sections">
+							<p>Time: {{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</p>
+							<p>Instructor: Dr. {{section.instructor.name}}</p>
+							<p>Location: {{section.location}}</p>
+						</a>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" ng-click="changeSection()">Confirm</button>
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" role="dialog" id="confirm-drop-course" aria-labelledby="confirmDropCourseLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4 class="text-danger">Are you sure to drop the course {{chosenSection.courseId}} and its section?</h4>
+					<li class="list-group-item list-group-item-warning">
+						<p>Time: {{chosenSection.timeslot.startTime}} - {{chosenSection.timeslot.endTime}} on {{chosenSection.weekday}}</p>
+						<p>Instructor: Dr. {{chosenSection.instructor.name}}</p>
+						<p>Location: {{chosenSection.location}}</p>
+					</li>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-danger" ng-click="dropCourse(chosenSection.id)">Yes, drop it.</button>
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
