@@ -1,5 +1,6 @@
 package ca.ams.services;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,11 @@ public class CourseService {
 	private CourseRepository courseRepos;
 	@Autowired
 	private TimeslotRepository timeslotRepos;
-	private final static String courseIdAndNameRegex = "[0-9A-Za-z]+";
+	@Autowired
+	private ProfessorService professorService;
+	
+	private final static String courseIdAndNameRegex = "[\\w]+";
+	private final static String locationRegex = "[A-Za-z]{2}[-_]{1}[\\d]{3}";
 
 	public List<Course> getCoursesById(String courseId) {
 		if(!courseId.matches(courseIdAndNameRegex)) return null;
@@ -56,5 +61,22 @@ public class CourseService {
 	public Timeslot getTimeslotByStartTimeAndEndTime(String startTime, String endTime) {
 		return timeslotRepos.findByStartTimeAndEndTime(startTime, endTime);
 	}
-	
+
+	public void addInstructorsInfo(List<Course> courses) {
+		Iterator<Course> iterator = courses.iterator();
+		while(iterator.hasNext()) {
+			Iterator<CourseSection> sections = iterator.next().getCourseSections().iterator();
+			while(sections.hasNext()) {
+				CourseSection section = sections.next();
+				Professor instructor = professorService.getProfessorById(section.getInstructorId());
+				professorService.clearSensitiveInfo(instructor);
+				section.setInstructorId(null);
+				section.setInstructor(instructor);
+			}
+		}
+	}
+
+	public boolean validateLocation(String location) {
+		return location.matches(locationRegex);
+	}
 }

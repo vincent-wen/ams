@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,7 +18,9 @@ public class CourseSection {
 	@Transient
 	private String courseId;
 	private String location;
-	@DBRef
+
+	private String instructorId;
+	@Transient
 	private Professor instructor;
 	private Timeslot timeslot;
 	private Weekday weekday;
@@ -38,11 +39,11 @@ public class CourseSection {
 	public void setLocation(String location) {
 		this.location = location;
 	}
-	public Professor getInstructor() {
-		return instructor;
+	public String getInstructorId() {
+		return instructorId;
 	}
-	public void setInstructor(Professor instructor) {
-		this.instructor = instructor;
+	public void setInstructorId(String instructorId) {
+		this.instructorId = instructorId;
 	}
 	public Timeslot getTimeslot() {
 		return timeslot;
@@ -99,5 +100,11 @@ public class CourseSection {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+	public Professor getInstructor() {
+		return instructor;
+	}
+	public void setInstructor(Professor instructor) {
+		this.instructor = instructor;
 	}
 }

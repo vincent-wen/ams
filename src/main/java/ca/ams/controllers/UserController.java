@@ -68,6 +68,9 @@ public class UserController {
 				CourseSection section = sections.next();
 				String id = section.getCourseObjectId();
 				section.setCourseId(courseService.getCourseById(id).getCourseId());
+				Professor instructor = professorService.getProfessorById(section.getInstructorId());
+				professorService.clearSensitiveInfo(instructor);
+				section.setInstructor(instructor);
 			}
 		}
 		return new ResponseEntity<User>(user, HttpStatus.OK);

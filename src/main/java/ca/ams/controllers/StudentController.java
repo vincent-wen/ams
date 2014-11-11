@@ -61,17 +61,19 @@ public class StudentController {
 		if(user.getRole() == Role.ROLE_STUDENT) {
 			CourseSection section = courseService.getSectionById(sectionId);
 			Student student = (Student) user;
-			if(studentService.ifSectionsConflict(student, section, false))
-				return new ResponseEntity<String>("Time is conflict with another course.", HttpStatus.CONFLICT);
-			if(studentService.ifCourseAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("You can not register for the same course twice within the same semester.", HttpStatus.CONFLICT);
-			if(courseService.isSectionFull(section))
-				return new ResponseEntity<String>("This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
+			if(studentService.ifSectionAlreadyRegistered(student, section))
+				return new ResponseEntity<String>("You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyCompleted(student, section))
 				return new ResponseEntity<String>("This course has already been completed.", HttpStatus.NOT_ACCEPTABLE);
 			if(!studentService.ifPrerequsitesFulfilled(student, section))
 				return new ResponseEntity<String>("You haven't fulfill the prerequisites of the course.", HttpStatus.NOT_ACCEPTABLE);
-
+			if(studentService.ifCourseAlreadyRegistered(student, section))
+				return new ResponseEntity<String>("You can not register for the same course twice within the same semester.", HttpStatus.CONFLICT);
+			if(studentService.ifSectionsConflict(student, section, false))
+				return new ResponseEntity<String>("Time is conflict with another course.", HttpStatus.CONFLICT);
+			if(courseService.isSectionFull(section))
+				return new ResponseEntity<String>("This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
+			
 			studentService.registerSection(student, section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}

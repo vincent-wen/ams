@@ -16,6 +16,8 @@ controller('AppCtrl', ['$scope', 'userService', '$window', function($scope, user
 controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $http, userService){
 	$scope.courseNameorId = '';
 	$scope.courses = {};
+	$scope.registerError = '';
+	$scope.registerSuccess = '';
 	$scope.user = userService.getUser;
 	$scope.professors = userService.getProfessors;
 	$scope.instructor = [];
@@ -42,7 +44,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 	}
 
 	$scope.searchAll = function() {
-		$http.post('/api/course/search-all', {})
+		$http.post('/api/course/search-all')
 		.success(function(data, status) {
 			$scope.courses = data;
 		})
@@ -54,9 +56,13 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 	$scope.registerSection = function(section) {
 		$http.post('/api/student/register-course', section.id)
 		.success(function(data, status) {
+			$scope.registerError = '';
+			$scope.registerSuccess = data;
 			userService.updateUser();
 		})
 		.error(function(data, status) {
+			$scope.registerError = data;
+			$scope.registerSuccess = '';
 			console.log(data);
 		})
 	}
@@ -98,11 +104,16 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 				name: $scope.instructor[key][id]
 			}
 		}
+		var errorContainer = angular.element(event.currentTarget).parent().parent().siblings('.text-danger');
 		$http.post('/api/section/change-instructor', updatedSection)
 		.success(function(data, status) {
+			errorContainer.html('');
+			section.instructor.name = $scope.instructor[key][id];
+			$scope.switchMode('instructorMode', key, id);
 			console.log(data);
 		})
 		.error(function(data, status) {
+			errorContainer.html(data);
 			console.log(data);
 		})
 	}
@@ -120,7 +131,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 		event.preventDefault();
 		var section = $scope.courses[key].courseSections[id];
 		var parentElem = angular.element(event.currentTarget).parent();
-		var errorElem = parentElem.parent().siblings('.text-danger');
+		var errorContainer = parentElem.parent().siblings('.text-danger');
 		var updatedSection = {
 			timeslot: {
 				startTime: parentElem.siblings('input[name="startTime"]').val(),
@@ -131,14 +142,35 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 		}
 		$http.post('/api/section/change-time', updatedSection)
 		.success(function(data, status) {
-			errorElem.html('');
+			errorContainer.html('');
 			section.weekday = updatedSection.weekday;
 			section.timeslot.startTime = updatedSection.timeslot.startTime;
 			section.timeslot.endTime = updatedSection.timeslot.endTime;
 			$scope.switchMode('timeMode', key, id);
 		})
 		.error(function(data, status) {
-			errorElem.html(data);
+			errorContainer.html(data);
+		})
+	}
+
+	$scope.changeLocation = function(event, key, id) {
+		event.preventDefault();
+		var section = $scope.courses[key].courseSections[id];
+		var location = angular.element(event.currentTarget).parent().siblings('input[name="location"]');
+		var errorContainer = location.parent().siblings('.text-danger');
+		var updatedSection = {
+			id: section.id,
+			location: location.val()
+		}
+		$http.post('/api/section/change-location', updatedSection)
+		.success(function(data, status) {
+			errorContainer.html('');
+			section.location = location.val();
+			$scope.switchMode('locationMode', key, id);
+		})
+		.error(function(data, status) {
+			console.log(errorContainer);
+			errorContainer.html(data);
 		})
 	}
 }]).

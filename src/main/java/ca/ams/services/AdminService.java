@@ -47,21 +47,24 @@ public class AdminService {
 		
 		CourseSection section1 = new CourseSection();
 		section1.setLocation("BL-403");
-		section1.setInstructor(professor1);
+		section1.setInstructorId(professor1.getId());
+		professor1.getInstructedSections().add(section1);
 		section1.setTimeslot(timeslot1);
 		section1.setWeekday(Weekday.Monday);
 		section1 = sectionRepos.save(section1);
 		
 		CourseSection section2 = new CourseSection();
 		section2.setLocation("BL-803");
-		section2.setInstructor(professor2);
+		section2.setInstructorId(professor2.getId());
+		professor2.getInstructedSections().add(section2);
 		section2.setTimeslot(timeslot2);
 		section2.setWeekday(Weekday.Tuesday);
 		section2 = sectionRepos.save(section2);
 		
 		CourseSection section3 = new CourseSection();
 		section3.setLocation("EV-303");
-		section3.setInstructor(professor3);
+		section3.setInstructorId(professor3.getId());
+		professor3.getInstructedSections().add(section3);
 		section3.setTimeslot(timeslot1);
 		section3.setWeekday(Weekday.Thursday);
 		section3 = sectionRepos.save(section3);
@@ -87,6 +90,9 @@ public class AdminService {
 		sectionRepos.save(section1);
 		sectionRepos.save(section2);
 		sectionRepos.save(section3);
+		professorRepos.save(professor1);
+		professorRepos.save(professor2);
+		professorRepos.save(professor3);
 	}
 
 	public Student createStudent1() {

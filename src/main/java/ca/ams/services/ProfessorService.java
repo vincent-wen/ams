@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import ca.ams.models.CourseSection;
 import ca.ams.models.Professor;
 import ca.ams.models.ProfessorRepository;
 
@@ -26,24 +27,48 @@ public class ProfessorService {
 		return professorRepos.save(professor);
 	}
 	
-	public List<Professor> getProfessorByName(String name) {
-		List<Professor> professors = getProfessor(name);
+	public List<Professor> getProfessorsByName(String name) {
+		List<Professor> professors = professorRepos.findByNameRegex(name);
 		Iterator<Professor> iterator = professors.iterator();
 		while(iterator.hasNext()) {
 			iterator.next().setPassword(null);
 		}
 		return professors;
 	}
-
-	public List<Professor> getProfessor(String name) {
-		return professorRepos.findByNameRegex(name);
-	}
-
+	
 	public Professor getProfessorById(String instructorId) {
 		return instructorId == null ? null:professorRepos.findOne(instructorId);
+	}
+	
+	public Professor getProfessorByName(String instructorName) {
+		return professorRepos.findByNameRegex(instructorName).get(0);
 	}
 
 	public List<Professor> getAllProfessors() {
 		return professorRepos.findAll();
+	}
+
+	public boolean ifSectionsConflict(Professor professor, CourseSection section) {
+		Iterator<CourseSection> iterator = professor.getInstructedSections().iterator();
+		while(iterator.hasNext()) {
+			CourseSection registeredSection= iterator.next();
+			if(registeredSection.getWeekday().equals(section.getWeekday()) && 
+					registeredSection.getTimeslot().equals(section.getTimeslot())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean ifSectionAlreadyRegistered(Professor professor, CourseSection section) {
+		List<CourseSection> sections = professor.getInstructedSections();
+		return sections.contains(section);
+	}
+	
+	public void clearSensitiveInfo(Professor professor) {
+		professor.setId(null);
+		professor.setPassword(null);
+		professor.setUsername(null);
+		professor.getInstructedSections().clear();
 	}
 }

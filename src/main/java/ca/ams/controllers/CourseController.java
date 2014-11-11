@@ -30,18 +30,27 @@ public class CourseController {
 	@RequestMapping(value="/api/course/search-by-id", method = RequestMethod.POST)
 	public @ResponseBody List<Course> searchById(@RequestBody String courseId) {
 		if(courseId.isEmpty()) return null;
-		return courseService.getCoursesById(courseId);
+		List<Course> courses = courseService.getCoursesById(courseId);
+		if(courses.isEmpty()) return null;
+		courseService.addInstructorsInfo(courses);
+		return courses;
 	}
 	
 	@RequestMapping(value="/api/course/search-by-name", method = RequestMethod.POST)
 	public @ResponseBody List<Course> searchByName(@RequestBody String courseName) {
 		if(courseName.isEmpty()) return null;
-		return courseService.getCoursesByName(courseName);
+		List<Course> courses = courseService.getCoursesByName(courseName);
+		if(courses.isEmpty()) return null;
+		courseService.addInstructorsInfo(courses);
+		return courses;
 	}
 	
 	@RequestMapping(value="/api/course/search-all", method = RequestMethod.POST)
 	public @ResponseBody List<Course> searchAll() {
-		return courseService.getAllCourses();
+		List<Course> courses = courseService.getAllCourses();
+		if(courses.isEmpty()) return null;
+		courseService.addInstructorsInfo(courses);
+		return courses;
 	}
 	
 	@RequestMapping(value="/api/section/change-time", method = RequestMethod.POST)
@@ -75,14 +84,44 @@ public class CourseController {
 		User user = userService.getCurrentUser();
 		if(user.getRole() == Role.ROLE_GPD) {
 			CourseSection section = courseService.getSectionById(courseSection.getId());
-			Professor newInstructor = professorService.getProfessorById(courseSection.getInstructor().getId());
+			Professor newInstructor = professorService.getProfessorByName(courseSection.getInstructor().getName());
 			
 			if(section == null)
 				return new ResponseEntity<String>("Section not found.", HttpStatus.NOT_FOUND);
 			if(newInstructor == null)
 				return new ResponseEntity<String>("Professor not found.", HttpStatus.NOT_FOUND);
+			if(professorService.ifSectionAlreadyRegistered(newInstructor, section))
+				return new ResponseEntity<String>("The professor have already been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
+			if(professorService.ifSectionsConflict(newInstructor, section))
+				return new ResponseEntity<String>("Time is conflict with another course section for this professor.", HttpStatus.CONFLICT);
 			
-			section.setInstructor(courseSection.getInstructor());
+			Professor oldInstructor = professorService.getProfessorById(section.getInstructorId());
+			section.setInstructorId(newInstructor.getId());
+			newInstructor.getInstructedSections().add(section);
+			oldInstructor.getInstructedSections().remove(section);
+			professorService.save(oldInstructor);
+			professorService.save(newInstructor);
+			courseService.save(section);
+			return new ResponseEntity<String>("success", HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value="/api/section/change-location", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> changeLocation(@RequestBody CourseSection courseSection) {
+		User user = userService.getCurrentUser();
+		if(user.getRole() == Role.ROLE_GPD) {
+			// find objects
+			CourseSection section = courseService.getSectionById(courseSection.getId());
+
+			// Handle exceptions before modifications
+			if(section == null)
+				return new ResponseEntity<String>("Course section not found.", HttpStatus.NOT_FOUND);
+			if(!courseService.validateLocation(courseSection.getLocation()))
+				return new ResponseEntity<String>("The format of location is invalid.", HttpStatus.NOT_ACCEPTABLE);
+
+			// Process modifications
+			section.setLocation(courseSection.getLocation());
 			courseService.save(section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}

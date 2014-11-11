@@ -3,6 +3,7 @@ package ca.ams.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document
 public class Professor extends User{
-	
+	@DBRef
 	private List<CourseSection> instructedSections = new ArrayList<CourseSection>();
 
 	public List<CourseSection> getInstructedSections() {

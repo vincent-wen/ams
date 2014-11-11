@@ -85,7 +85,9 @@ public class StudentService {
 
 	public void dropSection(Student student, CourseSection section) {
 		student.getRegisteredSections().remove(section);
+		section.getEnrolledStudentsId().remove(student.getId());
 		save(student);
+		courseService.save(section);
 	}
 
 	public List<Student> getStudentsById(String studentId) {
