@@ -1,6 +1,5 @@
 package ca.ams.services;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +62,9 @@ public class CourseService {
 	}
 
 	public void addInstructorsInfo(List<Course> courses) {
-		Iterator<Course> iterator = courses.iterator();
-		while(iterator.hasNext()) {
-			Iterator<CourseSection> sections = iterator.next().getCourseSections().iterator();
-			while(sections.hasNext()) {
-				CourseSection section = sections.next();
+		if(courses == null) return;
+		for(Course course : courses) {
+			for(CourseSection section : course.getCourseSections()) {
 				Professor instructor = professorService.getProfessorById(section.getInstructorId());
 				professorService.clearSensitiveInfo(instructor);
 				section.setInstructorId(null);

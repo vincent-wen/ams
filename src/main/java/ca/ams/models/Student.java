@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Document
 public class Student extends User{
 	
-	private int studentId;
+	private String studentId;
 	private String program;
 	@DBRef
 	private List<CourseSection> registeredSections = new ArrayList<CourseSection>();
@@ -22,13 +22,13 @@ public class Student extends User{
 	public List<CourseSection> getRegisteredSections() {
 		return registeredSections;
 	}
-	public HashMap<String, Grade> getCompletedCourseId() {
+	public HashMap<String, Grade> getCompletedCoursesId() {
 		return completedCoursesId;
 	}
-	public int getStudentId() {
+	public String getStudentId() {
 		return studentId;
 	}
-	public void setStudentId(int studentId) {
+	public void setStudentId(String studentId) {
 		this.studentId = studentId;
 	}
 	public String getProgram() {

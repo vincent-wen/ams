@@ -1,6 +1,7 @@
 package ca.ams.controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -83,9 +84,11 @@ public class CourseController {
 	public @ResponseBody ResponseEntity<String> changeInstructor(@RequestBody CourseSection courseSection) {
 		User user = userService.getCurrentUser();
 		if(user.getRole() == Role.ROLE_GPD) {
+			// find objects
 			CourseSection section = courseService.getSectionById(courseSection.getId());
 			Professor newInstructor = professorService.getProfessorByName(courseSection.getInstructor().getName());
 			
+			// Handle exceptions before modifications
 			if(section == null)
 				return new ResponseEntity<String>("Section not found.", HttpStatus.NOT_FOUND);
 			if(newInstructor == null)
@@ -95,6 +98,7 @@ public class CourseController {
 			if(professorService.ifSectionsConflict(newInstructor, section))
 				return new ResponseEntity<String>("Time is conflict with another course section for this professor.", HttpStatus.CONFLICT);
 			
+			// Process modifications
 			Professor oldInstructor = professorService.getProfessorById(section.getInstructorId());
 			section.setInstructorId(newInstructor.getId());
 			newInstructor.getInstructedSections().add(section);
@@ -144,5 +148,14 @@ public class CourseController {
 			return enrolledStudents;
 		}
 		return null;
+	}
+	
+	@RequestMapping(value="/api/course/get-grading-system", method = RequestMethod.POST)
+	public @ResponseBody HashMap<String, String> getGradingSystem() {
+		HashMap<String, String> gradingSystem = new HashMap<String, String>();
+		for(Grade grade : Grade.values()) {
+			gradingSystem.put(grade.name(), grade.toString());
+		}
+		return gradingSystem;
 	}
 }

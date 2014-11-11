@@ -1,24 +1,16 @@
 package ca.ams.models;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Document
-public class Grade {
-	private String letterGrade;
-	private float numberGrade;
-	public String getLetterGrade() {
-		return letterGrade;
+public enum Grade {
+	Aplus(4.3), A(4.0), Aminus(3.7),
+	Bplus(3.3), B(3.0), Bminus(2.7),
+	Cplus(2.3), C(2.0), Cminus(1.7),
+	F(0);
+	
+	private double grade;
+	private Grade(double grade) {
+		this.grade = grade;
 	}
-	public void setLetterGrade(String letterGrade) {
-		this.letterGrade = letterGrade;
-	}
-	public float getNumberGrade() {
-		return numberGrade;
-	}
-	public void setNumberGrade(float numberGrade) {
-		this.numberGrade = numberGrade;
+	public String toString() {
+		return Double.toString(this.grade);
 	}
 }

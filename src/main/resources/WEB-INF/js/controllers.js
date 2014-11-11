@@ -96,7 +96,8 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 		$scope.instructor[key][id] = professorName;
 	}
 
-	$scope.changeInstructor = function(key, id) {
+	$scope.changeInstructor = function(event, key, id) {
+		event.preventDefault();
 		var section = $scope.courses[key].courseSections[id];
 		var updatedSection = {
 			id: section.id,

@@ -1,6 +1,5 @@
 package ca.ams.services;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,8 @@ public class ProfessorService {
 	
 	public List<Professor> getProfessorsByName(String name) {
 		List<Professor> professors = professorRepos.findByNameRegex(name);
-		Iterator<Professor> iterator = professors.iterator();
-		while(iterator.hasNext()) {
-			iterator.next().setPassword(null);
+		for(Professor professor : professors) {
+			professor.setPassword(null);
 		}
 		return professors;
 	}
@@ -49,9 +47,7 @@ public class ProfessorService {
 	}
 
 	public boolean ifSectionsConflict(Professor professor, CourseSection section) {
-		Iterator<CourseSection> iterator = professor.getInstructedSections().iterator();
-		while(iterator.hasNext()) {
-			CourseSection registeredSection= iterator.next();
+		for(CourseSection registeredSection : professor.getInstructedSections()) {
 			if(registeredSection.getWeekday().equals(section.getWeekday()) && 
 					registeredSection.getTimeslot().equals(section.getTimeslot())) {
 				return true;

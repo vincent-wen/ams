@@ -1,7 +1,6 @@
 package ca.ams.services;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -88,8 +87,9 @@ public class UserService {
 	
 	public String getUserRole() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Iterator<? extends GrantedAuthority> iterator = auth.getAuthorities().iterator();
-		if(iterator.hasNext()) return iterator.next().getAuthority();
+		for(GrantedAuthority authority : auth.getAuthorities()) {
+			return authority.getAuthority();
+		}
 		return null;
 	}
 	

@@ -32,7 +32,7 @@ public class AdminService {
 		Professor professor1 = createProfessor1();
 		Professor professor2 = createProfessor2();
 		Professor professor3 = createProfessor3();
-		createStudent1();
+		Student student1 = createStudent1();
 		createGPD1();
 		
 		Timeslot timeslot1 = new Timeslot();
@@ -93,6 +93,9 @@ public class AdminService {
 		professorRepos.save(professor1);
 		professorRepos.save(professor2);
 		professorRepos.save(professor3);
+		
+		student1.getCompletedCoursesId().put(course2.getId(), Grade.Aminus);
+		studentRepos.save(student1);
 	}
 
 	public Student createStudent1() {
@@ -101,7 +104,7 @@ public class AdminService {
 		student.setPassword("111111a");
 		userService.encryptPassword(student);
 		student.setEmail("vincent.wen77@gmail.com");
-		student.setStudentId(6812910);
+		student.setStudentId("6812910");
 		student.setProgram("Software Engineering");
 		student.setName("Luheng Wen");
 		student.setRole(Role.ROLE_STUDENT);

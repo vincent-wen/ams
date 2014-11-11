@@ -60,7 +60,7 @@
 									<li role="presentation" ng-repeat="professor in professors() | filter: instructor[key][id]: false" ng-click="chooseProfessor(professor.name, key, id)"><a role="menuitem" tabindex="-1" href="">{{professor.name}}</a></li>
 								</ul>
 								<span class="btn-group">
-									<button class="btn btn-link" type="button" ng-click="changeInstructor(key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="changeInstructor($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
 									<button class="btn btn-link" type="button" ng-click="switchMode('instructorMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
 								</span>
 							</span>
