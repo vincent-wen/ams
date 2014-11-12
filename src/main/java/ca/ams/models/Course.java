@@ -15,7 +15,7 @@ public class Course {
 	@Id
 	private String id;
 	private String courseId;
-	private float credits;
+	private double credits;
 	private String courseName;
 	private String courseDescription;
 	private List<String> prerequisiteCourseIds = new ArrayList<String>();
@@ -49,11 +49,14 @@ public class Course {
 	public List<CourseSection> getCourseSections() {
 		return courseSections;
 	}
-	public float getCredits() {
+	public double getCredits() {
 		return credits;
 	}
-	public void setCredits(float credits) {
+	public void setCredits(double credits) {
 		this.credits = credits;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}	
 	
 }

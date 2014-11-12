@@ -132,16 +132,37 @@ public class CourseController {
 		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value="/api/section/change-capacity", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> changeCapacity(@RequestBody CourseSection courseSection) {
+		User user = userService.getCurrentUser();
+		if(user.getRole() == Role.ROLE_GPD) {
+			// find objects
+			CourseSection section = courseService.getSectionById(courseSection.getId());
+
+			// Handle exceptions before modifications
+			if(section == null)
+				return new ResponseEntity<String>("Course section not found.", HttpStatus.NOT_FOUND);
+			if(!courseService.validateCapacity(courseSection.getCapacity()))
+				return new ResponseEntity<String>("Capacity must be an integer between 10 to 300.", HttpStatus.NOT_ACCEPTABLE);
+			if(courseService.ifEnrolledStudentsMoreThanCapacity(section, courseSection.getCapacity()))
+				return new ResponseEntity<String>("Capacity must be bigger than the number of students who have been enrolled in this course section.", HttpStatus.NOT_ACCEPTABLE);
+
+			// Process modifications
+			section.setCapacity(courseSection.getCapacity());
+			courseService.save(section);
+			return new ResponseEntity<String>("success", HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+	}
+	
 	@RequestMapping(value = "/api/section/get-enrolled-students", method = RequestMethod.POST)
 	public @ResponseBody List<Student> getEnrolledStudentsForSection(@RequestBody String sectionId) {
 		User user = userService.getCurrentUser();
 		if(user.getRole().toString().matches("ROLE_PROFESSOR|ROLE_REGISTRAR|ROLE_GPD")) {
 			CourseSection section = courseService.getSectionById(sectionId);
 			List<Student> enrolledStudents = new ArrayList<Student>();
-			List<String> studentIds = section.getEnrolledStudentsId();
-			Iterator<String> iterator = studentIds.iterator();
-			while(iterator.hasNext()) {
-				Student student = studentService.getStudentById(iterator.next());
+			for(String studentId : section.getEnrolledStudentsId()) {
+				Student student = studentService.getStudentById(studentId);
 				student.setPassword(null);
 				enrolledStudents.add(student);
 			}
@@ -154,7 +175,7 @@ public class CourseController {
 	public @ResponseBody HashMap<String, String> getGradingSystem() {
 		HashMap<String, String> gradingSystem = new HashMap<String, String>();
 		for(Grade grade : Grade.values()) {
-			gradingSystem.put(grade.name(), grade.toString());
+			gradingSystem.put(grade.toString(), grade.grade());
 		}
 		return gradingSystem;
 	}

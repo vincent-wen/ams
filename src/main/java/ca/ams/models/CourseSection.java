@@ -24,7 +24,7 @@ public class CourseSection {
 	private Professor instructor;
 	private Timeslot timeslot;
 	private Weekday weekday;
-	private int size = 200;
+	private int capacity = 200;
 	private List<String> enrolledStudentsId = new ArrayList<String>();
 	
 	public String getCourseObjectId() {
@@ -57,11 +57,11 @@ public class CourseSection {
 	public void setWeekday(Weekday weekday) {
 		this.weekday = weekday;
 	}
-	public int getSize() {
-		return size;
+	public int getCapacity() {
+		return capacity;
 	}
-	public void setSize(int size) {
-		this.size = size;
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
 	}
 	public List<String> getEnrolledStudentsId() {
 		return enrolledStudentsId;

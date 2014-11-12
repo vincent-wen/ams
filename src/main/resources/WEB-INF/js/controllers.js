@@ -14,13 +14,26 @@ controller('AppCtrl', ['$scope', 'userService', '$window', function($scope, user
 }]).
 
 controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $http, userService){
+	$scope.weekdayPreference = {
+		Monday: true,
+		Tuesday: true,
+		Wednesday: true,
+		Thursday: true,
+		Friday: true,
+	}
+	$scope.weekdayKeys = Object.keys($scope.weekdayPreference);
 	$scope.courseNameorId = '';
+	$scope.studentNameorId = '';
 	$scope.courses = {};
+	$scope.students = {};
 	$scope.registerError = '';
 	$scope.registerSuccess = '';
 	$scope.user = userService.getUser;
 	$scope.professors = userService.getProfessors;
 	$scope.instructor = [];
+	$scope.chosen = {
+		studentId: null
+	}
 
 	$scope.searchById = function() {
 		console.log($scope.courseNameorId);
@@ -59,6 +72,44 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 			$scope.registerError = '';
 			$scope.registerSuccess = data;
 			userService.updateUser();
+		})
+		.error(function(data, status) {
+			$scope.registerError = data;
+			$scope.registerSuccess = '';
+			console.log(data);
+		})
+	}
+
+	$scope.searchStudents = function(value) {
+		var url;
+		if(value == parseInt(value)) {
+			url = '/api/student/search-by-id'
+		} else {
+			url = '/api/student/search-by-name'
+		}
+		$http.post(url, value).success(function(data, status) {
+			$scope.students = data;
+		})
+		.error(function(data, status) {
+			console.log(data);
+		})
+	}
+
+	$scope.registerSectionForStudent = function(section) {
+		$scope.chosenSection = section;
+		angular.element('#register-for-student').modal({
+			backdrop: 'static'
+		}).modal('show');
+	}
+
+	$scope.confirmRegisterForStudent = function() {
+		$http.post('/api/student/register-course/' + $scope.chosen.studentId, $scope.chosenSection.id)
+		.success(function(data, status) {
+			$scope.registerError = '';
+			$scope.registerSuccess = data;
+			setTimeout(function() {
+				angular.element('#register-for-student').modal('hide');
+			}, 1000);
 		})
 		.error(function(data, status) {
 			$scope.registerError = data;
@@ -123,6 +174,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 	$scope.timeMode = [];
 	$scope.instructorMode = [];
 	$scope.locationMode = [];
+	$scope.capacityMode = [];
 	
 	$scope.switchMode = function(mode, key, id) {
 		$scope[mode][key][id] = !$scope[mode][key][id];
@@ -174,12 +226,40 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', function($scope, $ht
 			errorContainer.html(data);
 		})
 	}
+
+	$scope.changeCapacity = function(event, key, id) {
+		event.preventDefault();
+		var section = $scope.courses[key].courseSections[id];
+		var capacity = angular.element(event.currentTarget).parent().siblings('input[name="capacity"]');
+		var errorContainer = capacity.parent().siblings('.text-danger');
+		console.log(parseInt(capacity.val()));
+		console.log(capacity.val());
+		if(capacity.val() != parseInt(capacity.val())) {
+			errorContainer.html('Capacity must be an integer between 10 to 300.');
+			return;
+		}
+		var updatedSection = {
+			id: section.id,
+			capacity: capacity.val()
+		}
+		$http.post('/api/section/change-capacity', updatedSection)
+		.success(function(data, status) {
+			errorContainer.html('');
+			section.capacity = capacity.val();
+			$scope.switchMode('capacityMode', key, id);
+		})
+		.error(function(data, status) {
+			console.log(errorContainer);
+			errorContainer.html(data);
+		})
+	}
 }]).
 
-controller('profileCtrl', ['$scope', '$http', 'userService', function($scope, $http, userService){
+controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem', function($scope, $http, userService, gradingSystem){
 	$scope.user = userService.getUser;
-	$scope.phoneNumber = $scope.user().phoneNumber;
-	$scope.email = $scope.user().email;
+	$scope.grades = gradingSystem.getGrades;
+	$scope.phoneNumber = '';
+	$scope.email = '';
 	$scope.editPhoneNumberMode = false;
 	$scope.editEmailMode = false;
 
@@ -261,6 +341,27 @@ controller('profileCtrl', ['$scope', '$http', 'userService', function($scope, $h
 		})
 	}
 
+	$scope.GPA = 0;
+	$scope.earnCredits = 0;
+	$scope.calculateGPAandCredits = function() {
+		var sumCredits = 0;
+		var sumGrades = 0;
+		var count = 0;
+		for(var id in $scope.user().completedCourses) {
+			var grade = $scope.user().completedCoursesId[id];
+			var credits = $scope.user().completedCourses[id].credits;
+			sumCredits += parseFloat(credits);
+			sumGrades += parseFloat($scope.grades()[grade]) * parseFloat(credits);
+			count ++;
+		}
+		$scope.GPA = sumGrades / sumCredits;
+		$scope.earnCredits = sumCredits;
+	}
+
+	$scope.$watchGroup(['user().completedCourses', 'grades()'], function() {
+		if(!angular.element.isEmptyObject($scope.grades()) && !angular.element.isEmptyObject($scope.user().completedCourses))
+			$scope.calculateGPAandCredits();
+	})
 }]).
 
 controller('StudentCtrl', ['$scope', '$http', 'userService', function($scope, $http, userService) {
@@ -271,7 +372,6 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', function($scope, $h
 		$http.post('/api/student/search-by-id', $scope.studentNameorId)
 		.success(function(data, status) {
 			$scope.students = data;
-			console.log(data);
 		})
 		.error(function(data, status) {
 			console.log(data);

@@ -33,6 +33,7 @@ public class AdminService {
 		Professor professor2 = createProfessor2();
 		Professor professor3 = createProfessor3();
 		Student student1 = createStudent1();
+		createStudent2();
 		createGPD1();
 		
 		Timeslot timeslot1 = new Timeslot();
@@ -44,6 +45,11 @@ public class AdminService {
 		timeslot2.setStartTime("15:00");
 		timeslot2.setEndTime("17:30");
 		timeslotRepos.save(timeslot2);
+		
+		Timeslot timeslot3 = new Timeslot();
+		timeslot3.setStartTime("11:45");
+		timeslot3.setEndTime("13:00");
+		timeslotRepos.save(timeslot3);
 		
 		CourseSection section1 = new CourseSection();
 		section1.setLocation("BL-403");
@@ -68,33 +74,62 @@ public class AdminService {
 		section3.setTimeslot(timeslot1);
 		section3.setWeekday(Weekday.Thursday);
 		section3 = sectionRepos.save(section3);
+		
+		CourseSection section4 = new CourseSection();
+		section4.setLocation("EV-411");
+		section4.setInstructorId(professor3.getId());
+		professor3.getInstructedSections().add(section3);
+		section4.setTimeslot(timeslot3);
+		section4.setWeekday(Weekday.Friday);
+		section4 = sectionRepos.save(section4);
 
 		Course course1 = new Course();
-		course1.setCourseDescription("QA course");
+		course1.setCourseDescription("Quality assurance, quality factors, components of a software quality assurance system, contract review, software development and quality plans, activities and alternatives, integration of quality activities  in a project lifecycle, reviews, software inspection, software verification,  testing processes, static analysis, control-flow analysis, data-flow analysis, control-flow testing, loop testing, data-flow testing, transaction-flow testing, domain testing, type-based analysis, dynamic analysis, usage models, operational profiles, result and defect analysis, reliability, performance analysis, maintenance and reverse engineering, case tools and software quality assurance. A project. Prerequisites:  INSE 6210, COMP 5541 or equivalent. ");
 		course1.setCourseId("INSE6260");
 		course1.setCourseName("Software Quality Assurance");
 		course1.getCourseSections().add(section1);
 		course1.getCourseSections().add(section2);
+		course1.setCredits(4.0);
 		course1 = courseRepos.save(course1);
 		
 		Course course2 = new Course();
-		course2.setCourseDescription("A course focused on detailed designs.");
+		course2.setCourseDescription("Introduction to software design processes and their models. Representations of design/architecture. Software architectures and design plans. Design methods, object-oriented application frameworks, design patterns, design quality and assurance, coupling and cohesion measurements, design verification and documentation. A design project.");
 		course2.setCourseId("SOEN6461");
 		course2.setCourseName("Software Design Methodology");
 		course2.getCourseSections().add(section3);
+		course2.setCredits(4.0);
 		course2 = courseRepos.save(course2);
+		
+		Course course3 = new Course();
+		course3.setCourseDescription("Problems of writing and managing code. Managing code complexity and quality through a programming process. Coding conventions. Inline software documentation. Software configuration management. Tools and techniques for testing software. Multithreading concurrency. Code reuse in software development. Quality in coding, fault tolerance. A project. Laboratory: two hours per week.");
+		course3.setCourseId("SOEN6441");
+		course3.setCourseName("Advanced Programming Practices");
+		course3.getCourseSections().add(section4);
+		course3.setCredits(4.0);
+		course3 = courseRepos.save(course3);
+		
+		Course course4 = new Course();
+		course4.setCourseDescription("Role of measurement in Software Engineering, theoretical, technical and managerial views on software measurement. Representational theory of measurement. Theoretical validation of software measurement. Measurement program: goal-driven approach. Collecting and analyzing software engineering data. Software quality modeling and measuring. Testing and measurement. Reliability models. Functional size measurement methods. Effort estimation models and their usage in project management. Software measurement standards. Tool support. A project.");
+		course4.setCourseId("SOEN6611");
+		course4.setCourseName("Software Measurement");
+//		course4.getCourseSections().add(section3);
+		course4.setCredits(4.0);
+		course4 = courseRepos.save(course4);
 		
 		section1.setCourseObjectId(course1.getId());
 		section2.setCourseObjectId(course1.getId());
 		section3.setCourseObjectId(course2.getId());
+		section4.setCourseObjectId(course3.getId());
 		sectionRepos.save(section1);
 		sectionRepos.save(section2);
 		sectionRepos.save(section3);
+		sectionRepos.save(section4);
 		professorRepos.save(professor1);
 		professorRepos.save(professor2);
 		professorRepos.save(professor3);
 		
-		student1.getCompletedCoursesId().put(course2.getId(), Grade.Aminus);
+		student1.getCompletedCoursesId().put(course3.getId(), Grade.A.toString());
+		student1.getCompletedCoursesId().put(course4.getId(), Grade.Bplus.toString());
 		studentRepos.save(student1);
 	}
 
@@ -109,6 +144,20 @@ public class AdminService {
 		student.setName("Luheng Wen");
 		student.setRole(Role.ROLE_STUDENT);
 		student.setPhoneNumber("514-430-8435");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent2() {
+		Student student = new Student();
+		student.setUsername("iris");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("irisli77@gmail.com");
+		student.setStudentId("1234567");
+		student.setProgram("Software Engineering");
+		student.setName("Iris Li");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-3245");
 		return studentRepos.save(student);
 	}
 	

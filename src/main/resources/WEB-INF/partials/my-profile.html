@@ -10,7 +10,7 @@
 			<span ng-hide="editPhoneNumberMode">{{user().phoneNumber}}</span>
 			<span class="list-edit" ng-show="editPhoneNumberMode">
 				<span class="input-group input-group-sm">
-					<input type="text" class="form-control" name="phoneNumber" ng-model="phoneNumber">
+					<input type="text" class="form-control" name="phoneNumber" ng-model="phoneNumber" ng-init="phoneNumber = user().phoneNumber">
 					<span class="input-group-btn">
 						<button class="btn btn-info" type="button" ng-click="changePhoneNumber()">save</button>
 						<button class="btn btn-default" type="button" ng-click="switchEditMode('editPhoneNumberMode')"><span class="glyphicon glyphicon-remove"></span></button>
@@ -25,7 +25,7 @@
 			<span ng-hide="editEmailMode">{{user().email}}</span>
 			<span class="list-edit" ng-show="editEmailMode">
 				<span class="input-group input-group-sm">
-					<input type="text" class="form-control" name="email" ng-model="email">
+					<input type="text" class="form-control" name="email" ng-model="email" ng-init="email = user().email">
 					<span class="input-group-btn">
 						<button class="btn btn-info" type="button" ng-click="changeEmail()">save</button>
 						<button class="btn btn-default" type="button" ng-click="switchEditMode('editEmailMode')"><span class="glyphicon glyphicon-remove"></span></button>
@@ -38,7 +38,7 @@
 	</ul>
 	<div class="panel panel-info" ng-show="user().role == 'Student'">
 		<div class="panel-heading">Current Course Sections:</div>
-		<table class="table table-hover" id="my-sections">
+		<table class="table table-hover my-tables">
 			<tr>
 				<th>Course ID</th>
 				<th>Timeslot</th>
@@ -57,6 +57,27 @@
 				</td>
 			</tr>
 		</table>
+	</div>
+	<div class="panel panel-success" ng-show="user().role == 'Student'">
+		<div class="panel-heading">Cpmpleted Courses:</div>
+		<table class="table table-hover my-tables">
+			<tr>
+				<th>Course ID</th>
+				<th>Course name</th>
+				<th>Credits</th>
+				<th>Grade</th>
+			</tr>
+			<tr ng-repeat="(id, grade) in user().completedCoursesId">
+				<td>{{user().completedCourses[id].courseId}}</td>
+				<td>{{user().completedCourses[id].courseName}}</td>
+				<td>{{user().completedCourses[id].credits}}</td>
+				<td>{{grade}} ({{grades()[grade]}})</td>
+			</tr>
+		</table>
+		<div class="panel-body">
+			<p>GPA: {{GPA}}</p>
+			<p>Have earn credits: {{earnCredits}}</p>
+		</div>
 	</div>
 	<div class="modal fade" role="dialog" id="display-sections" aria-labelledby="displaySectionsLabel" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog">

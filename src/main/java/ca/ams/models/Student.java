@@ -17,12 +17,13 @@ public class Student extends User{
 	private String program;
 	@DBRef
 	private List<CourseSection> registeredSections = new ArrayList<CourseSection>();
-	private HashMap<String, Grade> completedCoursesId = new HashMap<String, Grade>();
+	// <course object id, grade>
+	private HashMap<String, String> completedCoursesId = new HashMap<String, String>();
 	
 	public List<CourseSection> getRegisteredSections() {
 		return registeredSections;
 	}
-	public HashMap<String, Grade> getCompletedCoursesId() {
+	public HashMap<String, String> getCompletedCoursesId() {
 		return completedCoursesId;
 	}
 	public String getStudentId() {

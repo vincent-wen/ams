@@ -54,7 +54,7 @@ public class CourseService {
 	}
 
 	public boolean isSectionFull(CourseSection section) {
-		return section.getEnrolledStudentsId().size() == section.getSize();
+		return section.getEnrolledStudentsId().size() == section.getCapacity();
 	}
 
 	public Timeslot getTimeslotByStartTimeAndEndTime(String startTime, String endTime) {
@@ -75,5 +75,13 @@ public class CourseService {
 
 	public boolean validateLocation(String location) {
 		return location.matches(locationRegex);
+	}
+
+	public boolean validateCapacity(int capacity) {
+		return capacity >= 10 && capacity <=300;
+	}
+
+	public boolean ifEnrolledStudentsMoreThanCapacity(CourseSection section, int capacity) {
+		return section.getEnrolledStudentsId().size() > capacity;
 	}
 }

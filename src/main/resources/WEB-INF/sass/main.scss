@@ -1,6 +1,9 @@
 $black: #393939;
 $white: #B0B0B0;
 
+.text-light {
+	color: #FEEF99;
+}
 body {
 	background: $black;
 	color: $white;
@@ -62,7 +65,7 @@ hr { width: 100%; }
 	color: $black;
 }
 
-#my-sections {
+.my-tables {
 	margin-top: 20px;
 }
 

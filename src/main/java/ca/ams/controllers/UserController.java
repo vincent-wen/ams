@@ -63,9 +63,7 @@ public class UserController {
 		user.setPassword(null);
 		if(user.getRole() == Role.ROLE_STUDENT) {
 			Student student = (Student) user;
-			Iterator<CourseSection> sections = student.getRegisteredSections().iterator();
-			while(sections.hasNext()) {
-				CourseSection section = sections.next();
+			for(CourseSection section : student.getRegisteredSections()) {
 				String id = section.getCourseObjectId();
 				section.setCourseId(courseService.getCourseById(id).getCourseId());
 				Professor instructor = professorService.getProfessorById(section.getInstructorId());

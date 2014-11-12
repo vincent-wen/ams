@@ -8,7 +8,7 @@
 
 angular.module('app.services', []).
 
-service('userService',['$http', function($http) {
+service('userService', ['$http', 'gradingSystem', function($http, gradingSystem) {
 	var user = {};
 	var professors = {};
 	var update = function() {
@@ -21,6 +21,13 @@ service('userService',['$http', function($http) {
 				$http.post('/api/user/get-all-professors').success(function(data, status) {
 					professors = data;
 				})
+			if(user.role == "Student") {
+				$http.post('/api/student/get-completed-courses')
+				.success(function(data, status) {
+					user.completedCourses = data;
+					console.log(user);
+				})
+			}
 		});
 	};
 	update();
@@ -33,6 +40,22 @@ service('userService',['$http', function($http) {
 			return professors;
 		}
 	};
+}]).
+
+service('gradingSystem', ['$http', function($http) {
+	var grades = {};
+	var update = function() {
+		$http.post('/api/course/get-grading-system').success(function(data, status) {
+			grades = data;
+		})
+	}
+	update();
+	return {
+		getGrades: function() {
+			return grades;
+		},
+		updateGrades: update
+	}
 }]);
 
 // service('userService',['$http', '$q', function($http, $q) {
