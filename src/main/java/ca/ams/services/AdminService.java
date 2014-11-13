@@ -78,13 +78,13 @@ public class AdminService {
 		CourseSection section4 = new CourseSection();
 		section4.setLocation("EV-411");
 		section4.setInstructorId(professor3.getId());
-		professor3.getInstructedSections().add(section3);
+		professor3.getInstructedSections().add(section4);
 		section4.setTimeslot(timeslot3);
 		section4.setWeekday(Weekday.Friday);
 		section4 = sectionRepos.save(section4);
 
 		Course course1 = new Course();
-		course1.setCourseDescription("Quality assurance, quality factors, components of a software quality assurance system, contract review, software development and quality plans, activities and alternatives, integration of quality activities  in a project lifecycle, reviews, software inspection, software verification,  testing processes, static analysis, control-flow analysis, data-flow analysis, control-flow testing, loop testing, data-flow testing, transaction-flow testing, domain testing, type-based analysis, dynamic analysis, usage models, operational profiles, result and defect analysis, reliability, performance analysis, maintenance and reverse engineering, case tools and software quality assurance. A project. Prerequisites:  INSE 6210, COMP 5541 or equivalent. ");
+		course1.setCourseDescription("Quality assurance, quality factors, components of a software quality assurance system, contract review, software development and quality plans, activities and alternatives, integration of quality activities  in a project lifecycle, reviews, software inspection, software verification,  testing processes, static analysis, control-flow analysis, data-flow analysis, control-flow testing, loop testing, data-flow testing, transaction-flow testing, domain testing, type-based analysis, dynamic analysis, usage models, operational profiles, result and defect analysis, reliability, performance analysis, maintenance and reverse engineering, case tools and software quality assurance. A project.");
 		course1.setCourseId("INSE6260");
 		course1.setCourseName("Software Quality Assurance");
 		course1.getCourseSections().add(section1);
@@ -98,6 +98,7 @@ public class AdminService {
 		course2.setCourseName("Software Design Methodology");
 		course2.getCourseSections().add(section3);
 		course2.setCredits(4.0);
+		course2.getPrerequisiteCourseIds().add(course1.getId());
 		course2 = courseRepos.save(course2);
 		
 		Course course3 = new Course();
@@ -128,8 +129,8 @@ public class AdminService {
 		professorRepos.save(professor2);
 		professorRepos.save(professor3);
 		
-		student1.getCompletedCoursesId().put(course3.getId(), Grade.A.toString());
-		student1.getCompletedCoursesId().put(course4.getId(), Grade.Bplus.toString());
+		student1.getCompletedCoursesAndGrades().put(course3.getId(), Grade.A.toString());
+		student1.getCompletedCoursesAndGrades().put(course4.getId(), Grade.Bplus.toString());
 		studentRepos.save(student1);
 	}
 
@@ -168,7 +169,7 @@ public class AdminService {
 		userService.encryptPassword(gpd);
 		gpd.setName("Dhrubajyoti Goswami");
 		gpd.setEmail("goswami@cs.concordia.ca");
-		gpd.setPhoneNumber("514-848-2424 ext. 7882");
+		gpd.setPhoneNumber("514-848-2424 ext7882");
 		gpd.setRole(Role.ROLE_GPD);
 		return gpdRepos.save(gpd);
 	}
@@ -181,7 +182,7 @@ public class AdminService {
 		professor.setUsername("dssouli");
 		professor.setEmail("rachida.dssouli@concordia.ca");
 		professor.setRole(Role.ROLE_PROFESSOR);
-		professor.setPhoneNumber("514-848-2424 ext. 4162");
+		professor.setPhoneNumber("514-848-2424 ext4162");
 		return professorRepos.save(professor);
 	}
 	
@@ -193,7 +194,7 @@ public class AdminService {
 		professor.setUsername("gregb");
 		professor.setEmail("gregb@cs.concordia.ca");
 		professor.setRole(Role.ROLE_PROFESSOR);
-		professor.setPhoneNumber("514-848-2424 ext. 3031");
+		professor.setPhoneNumber("514-848-2424 ext3031");
 		return professorRepos.save(professor);
 	}
 	
@@ -205,6 +206,7 @@ public class AdminService {
 		professor.setUsername("peter");
 		professor.setEmail("peter.rigby@concordia.ca ");
 		professor.setRole(Role.ROLE_PROFESSOR);
+		professor.setPhoneNumber("514-848-2424 ext1234");
 		return professorRepos.save(professor);
 	}
 

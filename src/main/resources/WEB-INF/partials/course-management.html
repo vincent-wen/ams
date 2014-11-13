@@ -18,6 +18,10 @@
 	<div class="margin-bottom text-light" ng-hide="courses | isEmpty">
 		<span ng-repeat="weekday in weekdayKeys">
 			<input type="checkbox" name="weekdaysFilter" ng-model="weekdayPreference[weekday]" > {{weekday}} 
+		</span><br>
+		<span ng-repeat="(timeslot, value) in timeslotPreference">
+			<input type="checkbox" name="timeslotsFilter" ng-model="timeslotPreference[timeslot]">
+			 {{timeslot}} 
 		</span>
 	</div>
 
@@ -32,10 +36,10 @@
 					<h4>{{course.courseId}} - {{course.courseName}}</h4>
 					<footer class="text-right">
 						<a href="" ng-click="showCourseDescription(course)">
-							<span class="label label-default">Course Description</span>
+							<span class="label label-success">Course Description</span>
 						</a>
 						<a href="" data-toggle="collapse" data-target="#collapse-{{key}}">
-							<span class="label label-default">Show Sections<span class="caret"></span></span>
+							<span class="label label-primary">Show Sections<span class="caret"></span></span>
 						</a>
 					</footer>
 				</div>
@@ -44,7 +48,7 @@
 				<div class="panel-body" ng-show="course.courseSections | isEmpty">
 					<div class="text-active">No course section is open for this semester.</div>
 				</div>
-				<div class="panel-body" ng-repeat="(id, section) in course.courseSections" ng-show="weekdayPreference[section.weekday]">
+				<div class="panel-body" ng-repeat="(id, section) in course.courseSections" ng-show="sectionFilter(section)">
 					<div>
 						<div ng-init="timeMode[key][id] = false">Time: 
 							<span ng-hide="timeMode[key][id]">{{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</span>
@@ -63,7 +67,7 @@
 							<div class="text-danger" ng-show="timeMode[key][id]"></div>
 						</div>
 						<div ng-init="instructorMode[key][id] = false">Instructor: Dr. 
-							<span ng-hide="instructorMode[key][id]">{{section.instructor.name}}</span>
+							<span ng-hide="instructorMode[key][id]" data-toggle="tooltip" data-placement="right" title="Email: {{section.instructor.email}}&#10Contact: {{section.instructor.phoneNumber}}"><a>{{section.instructor.name}}</a></span>
 							<span class="section-edit dropdown" ng-show="instructorMode[key][id]">
 								<input type="text" id="professor_input" class="form-control input-sm dropdown-toggle" name="instructor" data-toggle="dropdown" ng-focus="displayProfessors()" ng-model="instructor[key][id]" ng-init="instructor[key][id] = section.instructor.name">
 								<ul class="dropdown-menu" id="professors_list" role="menu" aria-labelledby="professor_input">
@@ -89,7 +93,7 @@
 							<a href="" ng-click="switchMode('locationMode', key, id)" ng-hide="locationMode[key][id] || user().role != 'Graduate Program Director'"><span class="glyphicon glyphicon-pencil"></span></a>
 							<div class="text-danger" ng-show="locationMode[key][id]"></div>
 						</div>
-						<div ng-init="capacityMode[key][id] = false">Capacity: 
+						<div ng-init="capacityMode[key][id] = false">Size/Capacity: {{section.size}} /
 							<span ng-hide="capacityMode[key][id]">{{section.capacity}}</span>
 							<span class="section-edit" ng-show="capacityMode[key][id]">
 								<input type="number" class="form-control input-sm" name="capacity" step="1" ng-value="section.capacity">
@@ -102,9 +106,9 @@
 							<div class="text-danger" ng-show="capacityMode[key][id]"></div>
 						</div>
 					</div>
-					<a href="" class="section-footer pull-right" ng-click="registerSection(section)" ng-show="user().role == 'Student'"><span class="label label-info">Register</span></a>
-					<a href="" class="section-footer pull-right" ng-click="showEnrolledStudents(section)" ng-hide="user().role == 'Student'"><span class="label label-warning">Show enrolled students</span></a>
-					<a href="" class="section-footer pull-right" ng-click="registerSectionForStudent(section)" ng-show="user().role == 'Graduate Program Director' || user().role == 'Registrar'"><span class="label label-info">Register for Student</span></a>
+					<a href="" class="section-footer pull-right" ng-click="registerSection(section.id)" ng-show="user().role == 'Student'"><span class="label label-info">Register</span></a>
+					<a href="" class="section-footer pull-right" ng-click="showEnrolledStudents(section.id)" ng-hide="user().role == 'Student'"><span class="label label-warning">Show enrolled students</span></a>
+					<a href="" class="section-footer pull-right" ng-click="registerSectionForStudent(section.id)" ng-show="user().role == 'Graduate Program Director' || user().role == 'Registrar'"><span class="label label-info">Register for Student</span></a>
 					
 				</div>
 			</div>
@@ -118,9 +122,13 @@
 					<h4>Course Description</h4>
 				</div>
 				<div class="modal-body">
-					<p><span class="text-grey">Prerequistes: </span>{{currentCourse.prerequistes || "None"}}</p>
-					<p class="text-grey">Desiption:</p>
-					<p>{{currentCourse.courseDescription || "None"}}</p>
+					<div>
+						Prerequistes: 
+						<span ng-show="currentCourse.prerequisiteCourseIds.length == 0" class="text-grey">none</span>
+						<span ng-repeat="prerequisteId in currentCourse.prerequisiteCourseIds">{{prerequisteId}} </span>
+					</div>
+					<p >Desiption:</p>
+					<p>{{currentCourse.courseDescription || "none"}}</p>
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-default" data-dismiss="modal">Close</button>
@@ -174,6 +182,7 @@
 					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<table class="table">
 						<h4>Enrolled Students List</h4>
+						<div class="alert alert-success" role="alert" ng-hide="dropSuccess == ''">{{dropSuccess}}</div>
 						<tr class="warning">
 							<th>Student ID</th>
 							<th>Student Name</th>
@@ -187,8 +196,11 @@
 							<td>{{student.email}}</td>
 							<td>{{student.program}}</td>
 							<td>
-								<a href="" data-toggle="modal" data-target="#student-details" data-backdrop="static">
+								<a href="" ng-click="showStudentDetails(student)">
 									<span class="label label-default">View details</span>
+								</a>
+								<a href="" ng-click="dropSectionForStudent(student.id)" ng-hide="user().role == 'Professor'">
+									<span class="label label-danger">Drop Course Section</span>
 								</a>
 							</td>
 						</tr>
@@ -200,4 +212,20 @@
 			</div>
 		</div>
 	</div>
+	<div class="modal fade" role="dialog" id="drop-for-student-confirmation" aria-labelledby="dropForStudentConfirmationLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4>Are you sure to remove the student from this course section?</h4>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-danger" type="button" ng-click="confirmDropSectionForStudent()">Yes, go ahead!</button>
+					<button class="btn btn-default" data-dismiss="modal">Give up</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<student-details student="chosen.student" role="user().role"></student-details>
 </div>

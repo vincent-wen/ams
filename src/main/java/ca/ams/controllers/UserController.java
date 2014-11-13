@@ -2,7 +2,6 @@ package ca.ams.controllers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,8 @@ import ca.ams.services.*;
 public class UserController {
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private StudentService studentService;
 	@Autowired
 	private ProfessorService professorService;
 	@Autowired
@@ -62,14 +63,7 @@ public class UserController {
 		User user = userService.getCurrentUser();
 		user.setPassword(null);
 		if(user.getRole() == Role.ROLE_STUDENT) {
-			Student student = (Student) user;
-			for(CourseSection section : student.getRegisteredSections()) {
-				String id = section.getCourseObjectId();
-				section.setCourseId(courseService.getCourseById(id).getCourseId());
-				Professor instructor = professorService.getProfessorById(section.getInstructorId());
-				professorService.clearSensitiveInfo(instructor);
-				section.setInstructor(instructor);
-			}
+			studentService.makeFulldressedStudent((Student) user);
 		}
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,13 +19,15 @@ public class Student extends User{
 	@DBRef
 	private List<CourseSection> registeredSections = new ArrayList<CourseSection>();
 	// <course object id, grade>
-	private HashMap<String, String> completedCoursesId = new HashMap<String, String>();
+	private HashMap<String, String> completedCoursesAndGrades = new HashMap<String, String>();
+	@Transient
+	private List<Course> completedCourses = new ArrayList<Course>();
 	
 	public List<CourseSection> getRegisteredSections() {
 		return registeredSections;
 	}
-	public HashMap<String, String> getCompletedCoursesId() {
-		return completedCoursesId;
+	public HashMap<String, String> getCompletedCoursesAndGrades() {
+		return completedCoursesAndGrades;
 	}
 	public String getStudentId() {
 		return studentId;
@@ -37,6 +40,13 @@ public class Student extends User{
 	}
 	public void setProgram(String program) {
 		this.program = program;
+	}
+	public List<Course> getCompletedCourses() {
+		return completedCourses;
+	}
+	public void setCompletedCoursesAndGrades(
+			HashMap<String, String> completedCoursesAndGrades) {
+		this.completedCoursesAndGrades = completedCoursesAndGrades;
 	}
 	
 }

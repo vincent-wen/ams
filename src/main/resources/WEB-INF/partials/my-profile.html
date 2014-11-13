@@ -52,7 +52,7 @@
 				<td>{{section.weekday}}</td>
 				<td>{{section.instructor.name}}</td>
 				<td>
-				<a href="" ng-click="displaySections(section.courseId)" ><span class="label label-primary">Change section</span></a>
+				<a href="" ng-click="displaySections(section.courseId, section.id)" ><span class="label label-primary">Change section</span></a>
 				<a href="" ng-click="dropCourseRequest(section)" ><span class="label label-danger">Drop course</span></a>
 				</td>
 			</tr>
@@ -67,16 +67,16 @@
 				<th>Credits</th>
 				<th>Grade</th>
 			</tr>
-			<tr ng-repeat="(id, grade) in user().completedCoursesId">
-				<td>{{user().completedCourses[id].courseId}}</td>
-				<td>{{user().completedCourses[id].courseName}}</td>
-				<td>{{user().completedCourses[id].credits}}</td>
-				<td>{{grade}} ({{grades()[grade]}})</td>
+			<tr ng-repeat="course in user().completedCourses">
+				<td>{{course.courseId}}</td>
+				<td>{{course.courseName}}</td>
+				<td>{{course.credits}}</td>
+				<td>{{course.grade}} ({{grades()[course.grade]}})</td>
 			</tr>
 		</table>
 		<div class="panel-body">
-			<p>GPA: {{GPA}}</p>
-			<p>Have earn credits: {{earnCredits}}</p>
+			<p>GPA: {{user().GPA}}</p>
+			<p>Have earn credits: {{user().earnCredits}}</p>
 		</div>
 	</div>
 	<div class="modal fade" role="dialog" id="display-sections" aria-labelledby="displaySectionsLabel" tabindex="-1" aria-hidden="true">
@@ -87,7 +87,7 @@
 					<h4>Select a new course Section</h4>
 					<div class="text-danger">{{changeSectionError}}</div>
 					<div class="list-group">
-						<a href="" class="list-group-item" ng-click="chooseSection($event, section)" ng-repeat="section in sections">
+						<a href="" class="list-group-item" ng-click="chooseSection($event, section)" ng-repeat="section in sections" ng-class="{disabled:registerSectionId == section.id}">
 							<p>Time: {{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</p>
 							<p>Instructor: Dr. {{section.instructor.name}}</p>
 							<p>Location: {{section.location}}</p>

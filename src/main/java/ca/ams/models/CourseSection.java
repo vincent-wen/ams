@@ -24,6 +24,8 @@ public class CourseSection {
 	private Professor instructor;
 	private Timeslot timeslot;
 	private Weekday weekday;
+	@Transient
+	private int size;
 	private int capacity = 200;
 	private List<String> enrolledStudentsId = new ArrayList<String>();
 	
@@ -106,5 +108,14 @@ public class CourseSection {
 	}
 	public void setInstructor(Professor instructor) {
 		this.instructor = instructor;
+	}
+	public void setEnrolledStudentsId(List<String> enrolledStudentsId) {
+		this.enrolledStudentsId = enrolledStudentsId;
+	}
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
 	}
 }

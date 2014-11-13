@@ -2,5 +2,5 @@
   <li><a href="/course" data-toggle="pill">Course Management</a></li>
   <li ng-hide="user().role == 'Student'"><a href="/student" data-toggle="pill">Student Management</a></li>
   <li><a href="/profile" data-toggle="pill">Profile Display</a></li>
-  <li><a href="/payment" data-toggle="pill">Tuition Payment</a></li>
+  <li ng-show="user().role == 'Student'"><a href="/payment" data-toggle="pill">Tuition Payment</a></li>
 </ul>

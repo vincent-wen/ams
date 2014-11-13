@@ -5,9 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ca.ams.models.CourseSection;
-import ca.ams.models.Professor;
-import ca.ams.models.ProfessorRepository;
+import ca.ams.models.*;
 
 @Component
 public class ProfessorService {
@@ -66,5 +64,13 @@ public class ProfessorService {
 		professor.setPassword(null);
 		professor.setUsername(null);
 		professor.getInstructedSections().clear();
+	}
+
+	public boolean isTimeConflictForProfessor(Professor professor, Timeslot newTimeslot, Weekday weekday) {
+		for(CourseSection section : professor.getInstructedSections()) {
+			if(section.getTimeslot().equals(newTimeslot) && section.getWeekday().equals(weekday))
+				return true;
+		}
+		return false;
 	}
 }

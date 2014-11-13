@@ -2,7 +2,6 @@ package ca.ams.controllers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,7 @@ public class CourseController {
 	public @ResponseBody List<Course> searchById(@RequestBody String courseId) {
 		if(courseId.isEmpty()) return null;
 		List<Course> courses = courseService.getCoursesById(courseId);
-		if(courses.isEmpty()) return null;
-		courseService.addInstructorsInfo(courses);
+		courseService.makeFulldressedCourses(courses, userService.getCurrentUser().getRole() == Role.ROLE_STUDENT);
 		return courses;
 	}
 	
@@ -41,16 +39,14 @@ public class CourseController {
 	public @ResponseBody List<Course> searchByName(@RequestBody String courseName) {
 		if(courseName.isEmpty()) return null;
 		List<Course> courses = courseService.getCoursesByName(courseName);
-		if(courses.isEmpty()) return null;
-		courseService.addInstructorsInfo(courses);
+		courseService.makeFulldressedCourses(courses, userService.getCurrentUser().getRole() == Role.ROLE_STUDENT);
 		return courses;
 	}
 	
 	@RequestMapping(value="/api/course/search-all", method = RequestMethod.POST)
 	public @ResponseBody List<Course> searchAll() {
 		List<Course> courses = courseService.getAllCourses();
-		if(courses.isEmpty()) return null;
-		courseService.addInstructorsInfo(courses);
+		courseService.makeFulldressedCourses(courses, userService.getCurrentUser().getRole() == Role.ROLE_STUDENT);
 		return courses;
 	}
 	
@@ -70,6 +66,12 @@ public class CourseController {
 				return new ResponseEntity<String>("The timeslot is not found.", HttpStatus.NOT_ACCEPTABLE);
 			if(weekday == null)
 				return new ResponseEntity<String>("The weekday is not valid.", HttpStatus.NOT_ACCEPTABLE);
+			if(section.getTimeslot().equals(newTimeslot) && section.getWeekday().equals(weekday))
+				return new ResponseEntity<String>("The time is already set.", HttpStatus.NOT_ACCEPTABLE);
+			
+			Professor professor = professorService.getProfessorById(section.getInstructorId());
+			if(professorService.isTimeConflictForProfessor(professor, newTimeslot, weekday))
+				return new ResponseEntity<String>("The time is conflit to another course of the same instructor.", HttpStatus.NOT_ACCEPTABLE);
 			
 			// Process modifications
 			section.setTimeslot(newTimeslot);
@@ -178,5 +180,10 @@ public class CourseController {
 			gradingSystem.put(grade.toString(), grade.grade());
 		}
 		return gradingSystem;
+	}
+	
+	@RequestMapping(value="/api/course/get-all-timeslots", method = RequestMethod.POST)
+	public @ResponseBody List<Timeslot> getAllTimeslots() {
+		return courseService.getAllTimeslots();
 	}
 }

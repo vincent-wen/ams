@@ -4,9 +4,22 @@ $white: #B0B0B0;
 .text-light {
 	color: #FEEF99;
 }
+
+html {
+  overflow-y:scroll;
+  background: $black url('../img/bg.jpg') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 body {
-	background: $black;
-	color: $white;
+	background-color: transparent;
+}
+
+.navbar-inverse .navbar-text {
+    color: $white;
 }
 
 #content-zone {
@@ -19,7 +32,7 @@ body {
 }
 
 #main-content {
-	background: grey;
+	background: $black;
 }
 
 #lg_panel {
@@ -34,10 +47,6 @@ body {
 .navbar li li a:hover{
 	color: white;
 	background-color: #3597C8;
-}
-
-.modal, .popover {
-	color: $black;
 }
 
 .margin-bottom {
@@ -59,10 +68,6 @@ hr { width: 100%; }
 	position: relative;
 	padding: 0 10px;
 	span {font-size: 90%;}
-}
-
-.panel-body {
-	color: $black;
 }
 
 .my-tables {

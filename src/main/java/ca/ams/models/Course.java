@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,6 +19,8 @@ public class Course {
 	private double credits;
 	private String courseName;
 	private String courseDescription;
+	@Transient
+	private String grade;
 	private List<String> prerequisiteCourseIds = new ArrayList<String>();
 	@DBRef
 	private List<CourseSection> courseSections = new ArrayList<CourseSection>();
@@ -57,6 +60,12 @@ public class Course {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public String getGrade() {
+		return grade;
+	}
+	public void setGrade(String grade) {
+		this.grade = grade;
 	}	
 	
 }

@@ -54,4 +54,9 @@ public class Timeslot {
 			return false;
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "Timeslot [startTime=" + startTime + ", endTime=" + endTime
+				+ "]";
+	}
 }

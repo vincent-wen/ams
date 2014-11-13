@@ -8,29 +8,38 @@
 
 angular.module('app.services', []).
 
-service('userService', ['$http', 'gradingSystem', function($http, gradingSystem) {
-	var user = {};
+service('userService', ['$http', '$rootScope', function($http, $rootScope) {
+	var user = null;
 	var professors = {};
 	var update = function() {
 		$http.post('/api/get-current-user').success(function(data, status) {
 			user = data;
 			user.role = data.role == "ROLE_STUDENT" ? "Student" :
-									data.role == "ROLE_PROFESSOR" ? "Professor" :
-									data.role == "ROLE_REGISTRAR" ? "Registrar" : "Graduate Program Director";
+			data.role == "ROLE_PROFESSOR" ? "Professor" :
+			data.role == "ROLE_REGISTRAR" ? "Registrar" : "Graduate Program Director";
 			if(user.role == "Graduate Program Director")
-				$http.post('/api/user/get-all-professors').success(function(data, status) {
-					professors = data;
-				})
+				$http.post('/api/user/get-all-professors')
+			.success(function(data, status) {
+				professors = data;
+			})
 			if(user.role == "Student") {
-				$http.post('/api/student/get-completed-courses')
-				.success(function(data, status) {
-					user.completedCourses = data;
-					console.log(user);
-				})
+				$rootScope.$emit('student:updated', user);
 			}
 		});
-	};
+	}
+	// var updateCompletedCourses = function(student) {
+	// 	$http.post('/api/student/get-completed-courses', student.id)
+	// 	.success(function(data, status) {
+	// 		if(student == undefined) {
+	// 			user.completedCourses= data;
+	// 		} else {
+	// 			student.completedCourses = data;
+	// 		}
+	// 		$rootScope.$emit('student:completedCourses:updated', student);
+	// 	})	
+	// }
 	update();
+
 	return {
 		getUser: function() {
 			return user;
@@ -42,19 +51,67 @@ service('userService', ['$http', 'gradingSystem', function($http, gradingSystem)
 	};
 }]).
 
-service('gradingSystem', ['$http', function($http) {
-	var grades = {};
+service('gradingSystem', ['$http', '$rootScope', 'userService', 
+	function($http, $rootScope, userService) {
+		var grades = null;
+		var GPA = {};
+		var earnCredits = {};
+		var user = userService.getUser;
+
+		var update = function() {
+			$http.post('/api/course/get-grading-system')
+			.success(function(data, status) {
+				grades = data;
+				if(user() != null && user().role == "Student")
+					calculateGPAandCredits(user());
+			})
+		}
+		update();
+
+		var calculateGPAandCredits = function(student) {
+			var sumCredits = 0;
+			var sumGrades = 0;
+
+			for(var i=0; i<student.completedCourses.length; i++) {
+				var course = student.completedCourses[i];
+				sumCredits += parseFloat(course.credits);
+				sumGrades += parseFloat(grades[course.grade]) * parseFloat(course.credits);
+			}
+
+			student.GPA = sumGrades / sumCredits;
+			student.earnCredits = sumCredits;
+		}
+
+		$rootScope.$on('student:updated', function(event, student) {
+			if(student.role != "Student" || grades == null) return;
+			calculateGPAandCredits(student);
+		})
+
+		return {
+			getGrades: function() {
+				return grades;
+			},
+			update: function(student) {
+				return calculateGPAandCredits(student);
+			}
+		}
+	}]).
+
+service('timeslotService', ['$http', function($http){
+	console.log("message");
+	var timeslots = {};
 	var update = function() {
-		$http.post('/api/course/get-grading-system').success(function(data, status) {
-			grades = data;
+		$http.post('/api/course/get-all-timeslots')
+		.success(function(data, status) {
+			timeslots = data;
 		})
 	}
 	update();
 	return {
-		getGrades: function() {
-			return grades;
+		getTimeslots: function() {
+			return timeslots;
 		},
-		updateGrades: update
+		updateTimeslots: update
 	}
 }]);
 
@@ -64,6 +121,6 @@ service('gradingSystem', ['$http', function($http) {
 // 	$http.post('/api/get-current-user').success(function(user, status) {
 // 		deferred.resolve(user);
 // 	});
-	
+
 // 	return deferred.promise;
 // }]);

@@ -49,8 +49,8 @@ public class CourseService {
 		courseRepos.save(course);
 	}
 
-	public Course getCourseById(String Id) {
-		return courseRepos.findOne(Id);
+	public Course getCourseById(String id) {
+		return id == null ? null : courseRepos.findOne(id);
 	}
 
 	public boolean isSectionFull(CourseSection section) {
@@ -61,14 +61,27 @@ public class CourseService {
 		return timeslotRepos.findByStartTimeAndEndTime(startTime, endTime);
 	}
 
-	public void addInstructorsInfo(List<Course> courses) {
-		if(courses == null) return;
+	public void makeFulldressedCourses(List<Course> courses, boolean isStudent) {
+		if(courses == null || courses.isEmpty()) return;
 		for(Course course : courses) {
 			for(CourseSection section : course.getCourseSections()) {
+				// add instructor basic info
 				Professor instructor = professorService.getProfessorById(section.getInstructorId());
 				professorService.clearSensitiveInfo(instructor);
 				section.setInstructorId(null);
 				section.setInstructor(instructor);
+				
+				// remove enrolled student lists for security
+				section.setSize(section.getEnrolledStudentsId().size());
+				if(isStudent) {
+					section.setEnrolledStudentsId(null);
+				}
+			}
+			// replace course objectId with course id for prerequisites
+			for(int i=0; i<course.getPrerequisiteCourseIds().size(); i++) {
+				String id = course.getPrerequisiteCourseIds().get(i);
+				Course prerequisite = getCourseById(id);
+				course.getPrerequisiteCourseIds().set(i, prerequisite.getCourseId());
 			}
 		}
 	}
@@ -83,5 +96,9 @@ public class CourseService {
 
 	public boolean ifEnrolledStudentsMoreThanCapacity(CourseSection section, int capacity) {
 		return section.getEnrolledStudentsId().size() > capacity;
+	}
+
+	public List<Timeslot> getAllTimeslots() {
+		return timeslotRepos.findAll();
 	}
 }

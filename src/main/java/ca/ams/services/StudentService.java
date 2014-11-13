@@ -16,6 +16,8 @@ public class StudentService {
 	private CourseService courseService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private ProfessorService professorService;
 
 	private final static String studentIdRegex = "[0-9]+";
 	private final static String studentNameRegex = "[A-Za-z\\s]+";
@@ -55,12 +57,12 @@ public class StudentService {
 	}
 
 	public boolean ifCourseAlreadyCompleted(Student student, CourseSection section) {
-		return student.getCompletedCoursesId().containsKey(section.getCourseObjectId());
+		return student.getCompletedCoursesAndGrades().containsKey(section.getCourseObjectId());
 	}
 
 	public boolean ifPrerequsitesFulfilled(Student student,	CourseSection section) {
 		Course course = courseService.getCourseById(section.getCourseObjectId());
-		Set<String> completedCourseIds = student.getCompletedCoursesId().keySet();
+		Set<String> completedCourseIds = student.getCompletedCoursesAndGrades().keySet();
 		return completedCourseIds.containsAll(course.getPrerequisiteCourseIds());
 	}
 
@@ -76,6 +78,7 @@ public class StudentService {
 	}
 
 	public void dropSection(Student student, CourseSection section) {
+		if(student == null || section == null) return;
 		student.getRegisteredSections().remove(section);
 		section.getEnrolledStudentsId().remove(student.getId());
 		save(student);
@@ -125,5 +128,29 @@ public class StudentService {
 
 	public boolean ifSectionAlreadyRegistered(Student student, CourseSection section) {
 		return student.getRegisteredSections().contains(section);
+	}
+
+	public void makeFulldressedStudent(Student student) {
+		if(student == null) return;
+		for(CourseSection section : student.getRegisteredSections()) {
+			String id = section.getCourseObjectId();
+			section.setCourseId(courseService.getCourseById(id).getCourseId());
+			Professor instructor = professorService.getProfessorById(section.getInstructorId());
+			professorService.clearSensitiveInfo(instructor);
+			section.setInstructor(instructor);
+		}
+		for(String courseId : student.getCompletedCoursesAndGrades().keySet()) {
+			Course course = courseService.getCourseById(courseId);
+			String grade = student.getCompletedCoursesAndGrades().get(courseId);
+			
+			course.setCourseDescription(null);
+			course.setId(null);
+			course.getCourseSections().clear();
+			course.getPrerequisiteCourseIds().clear();
+			course.setGrade(grade);
+			
+			student.getCompletedCourses().add(course);
+		}
+		student.setCompletedCoursesAndGrades(null);
 	}
 }

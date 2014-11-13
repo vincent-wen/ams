@@ -42,8 +42,8 @@ directive('changePassword', ['$http', function($http) {
 			}
 
 			angular.element('#change_password').on('show.bs.modal hide.bs.modal', function (e) {
-			  scope.successMessage = '';
-			  scope.errorMessage = '';
+				scope.successMessage = '';
+				scope.errorMessage = '';
 				scope.newpassword = '';
 				scope.oldpassword = '';
 				scope.repeatpassword = '';
@@ -51,24 +51,24 @@ directive('changePassword', ['$http', function($http) {
 			})
 
 			//set dirty to form field level
-		  var setDirty = function(field) {
-		    field.$dirty = true;
-		    field.$pristine = false;
-		  };
+			var setDirty = function(field) {
+				field.$dirty = true;
+				field.$pristine = false;
+			};
 		  //clear data
 		  var clearData = function(field) {
 		  	field.$modelValue = '';
-		    field.$viewValue = '';
-		    field.$$lastCommittedViewValue = '';
+		  	field.$viewValue = '';
+		  	field.$$lastCommittedViewValue = '';
 		  }
 		  // register popover event
-			var input_newpassword = element.find('input[name=newpassword]');
-			input_newpassword.popover({
-				trigger: 'focus',
-				container: 'body',
-				title: 'Constraints',
-				content: "The length must be between 6 to 20 characters. There should be at least one number and one letter of upper case or lower case."
-			});
+		  var input_newpassword = element.find('input[name=newpassword]');
+		  input_newpassword.popover({
+		  	trigger: 'focus',
+		  	container: 'body',
+		  	title: 'Constraints',
+		  	content: "The length must be between 6 to 20 characters. There should be at least one number and one letter of upper case or lower case."
+		  });
 		}
 	}
 }]).
@@ -76,15 +76,15 @@ directive('changePassword', ['$http', function($http) {
 directive('matchPassword', ['$parse', function($parse) {
 	return {
 		require: 'ngModel',
-    link: function(scope, elem, attrs, ngModel) {
-      scope.$watch(function() { 
-        return $parse(attrs.matchPassword)(scope) === ngModel.$viewValue;
-      }, function(currentValue) {
-        ngModel.$setValidity('mismatch', currentValue);
+		link: function(scope, elem, attrs, ngModel) {
+			scope.$watch(function() { 
+				return $parse(attrs.matchPassword)(scope) === ngModel.$viewValue;
+			}, function(currentValue) {
+				ngModel.$setValidity('mismatch', currentValue);
         // fix a bug of AngularJS
         if(ngModel.$modelValue == undefined) scope.repeatpassword = ngModel.$$invalidModelValue;
       });
-    }
+		}
 	}
 }]).
 
@@ -102,6 +102,22 @@ directive('leftPanel', ['$window', function($window) {
 				activeli = angular.element(this).parent();
 				activeli.addClass('active');
 			})
+		}
+	}
+}]).
+
+directive('studentDetails', ['gradingSystem', function(gradingSystem) {
+	return {
+		restrict: 'E',
+		scope: {
+			student: '=',
+			role: '='
+		},
+		templateUrl: '/api/partials/model-student-details',
+		link: function(scope, elem, attr) {
+			scope.grades = gradingSystem.getGrades;
+			scope.GPA = gradingSystem.getGPA;
+			scope.earnCredits = gradingSystem.getCredits;
 		}
 	}
 }]);
