@@ -23,7 +23,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
          		.antMatchers(HttpMethod.GET, "/css/**").permitAll() 
          		.antMatchers(HttpMethod.GET, "/bower_components/**").permitAll()
          		.antMatchers(HttpMethod.GET, "/img/**").permitAll()
-         		.antMatchers(HttpMethod.GET, "/init").permitAll()
          		.anyRequest().authenticated()
          		.and()
             .logout()                                    
