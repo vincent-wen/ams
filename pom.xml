@@ -6,10 +6,10 @@
 	<groupId>ca.ams</groupId>
 	<artifactId>ams</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
-	<name>sms</name>
-	<description>SMS project for Spring Boot</description>
+	<name>ams</name>
+	<description>AMS project with Spring Boot</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -73,7 +73,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<start-class>ca.ams.Application</start-class>
-		<java.version>1.8</java.version>
+		<java.version>1.7</java.version>
 		<main.basedir>${basedir}/../..</main.basedir>
 	</properties>
 
@@ -82,6 +82,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+			   <groupId>com.google.appengine</groupId>
+			   <artifactId>appengine-maven-plugin</artifactId>
+			   <version>1.9.15</version>
 			</plugin>
 		</plugins>
 	</build>
