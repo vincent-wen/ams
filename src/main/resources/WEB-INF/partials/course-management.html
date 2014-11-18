@@ -123,11 +123,11 @@
 				</div>
 				<div class="modal-body">
 					<div>
-						Prerequistes: 
+						<strong>Prerequistes:</strong> 
 						<span ng-show="currentCourse.prerequisiteCourseIds.length == 0" class="text-grey">none</span>
 						<span ng-repeat="prerequisteId in currentCourse.prerequisiteCourseIds">{{prerequisteId}} </span>
 					</div>
-					<p >Desiption:</p>
+					<p ><strong>Desiption:</strong></p>
 					<p>{{currentCourse.courseDescription || "none"}}</p>
 				</div>
 				<div class="modal-footer">

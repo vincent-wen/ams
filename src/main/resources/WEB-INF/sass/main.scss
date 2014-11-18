@@ -1,8 +1,9 @@
 $black: #393939;
 $white: #B0B0B0;
+$yellow-light: #FEEF99;
 
 .text-light {
-	color: #FEEF99;
+	color: $yellow-light;
 }
 
 html {
