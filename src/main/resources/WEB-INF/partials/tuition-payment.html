@@ -1,1 +1,15 @@
-<h3 class="text-light">payment</h3>
+<div ng-controller="PaymentCtrl">
+	<h3 class="text-light">Payment</h3>
+
+	<span id="signinButton">
+		<span
+		class="g-signin"
+		data-callback="signinCallback"
+		data-clientid="490594269984-8mvius4pm1grtjjhmbcc655lggqu4364.apps.googleusercontent.com"
+		data-cookiepolicy="single_host_origin"
+		data-scope="email profile https://www.googleapis.com/auth/paymentssandbox.make_payments">
+	</span>
+</span>
+</div>
+
+<script src="https://apis.google.com/js/client:platform.js" async defer></script>
