@@ -1,15 +1,177 @@
-<div ng-controller="PaymentCtrl">
-	<h3 class="text-light">Payment</h3>
 
-	<span id="signinButton">
-		<span
-		class="g-signin"
-		data-callback="signinCallback"
-		data-clientid="490594269984-8mvius4pm1grtjjhmbcc655lggqu4364.apps.googleusercontent.com"
-		data-cookiepolicy="single_host_origin"
-		data-scope="email profile https://www.googleapis.com/auth/paymentssandbox.make_payments">
-	</span>
-</span>
+<payment>
+<h3 class="text-light">Payment</h3>
+
+<div class="panel panel-default">
+	<div class="panel-body">
+		Your total tuition:
+		<span class="pull-right">6000</span><br>
+		Amount already paid:
+		<span class="pull-right">{{6000 - user().tuition}}</span><br>
+		<hr>
+		<strong>Your remain toition:</strong>
+		<span class="pull-right text-danger">{{user().tuition}}</span>
+	</div>
+</div>
+<div>
+	<button class="btn btn-success" data-toggle="modal" data-target="#credit-card-info" data-backdrop="static">Pay by Credit Card</button>
 </div>
 
-<script src="https://apis.google.com/js/client:platform.js" async defer></script>
+<div class="modal fade" role="dialog" id="credit-card-info" aria-labelledby="creditCardInfoLabel" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" ng-hide="isPaymentComplete">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4>Input your credit card's information</h4>
+				<div class="text-danger">{{errorMessage}}</div>
+			</div>
+			<form class="form-horizontal" name="credit_card_form" role="form" method="POST" novalidate>
+				<div class="modal-body">
+					<div class="form-group">
+						<div class="col-sm-offset-3">
+							<label class="radio-inline">
+								<input type="radio" name="inlineRadioOptions" ng-model="cardType" value="mastercard"> Master Card
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="inlineRadioOptions" ng-model="cardType" value="visa"> Visa
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="inlineRadioOptions" ng-model="cardType" value="discover"> Discover
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="inlineRadioOptions" ng-model="cardType" value="amex"> American Express
+							</label>
+						</div>
+					</div>
+					<div class="form-group" ng-class="{
+			  			'has-error has-feedback': credit_card_form.amount.$dirty && credit_card_form.amount.$invalid, 
+			  			'has-success has-feedback': credit_card_form.amount.$dirty && credit_card_form.amount.$valid
+			  			}">
+			  		<label for="amount" class="control-label col-sm-3">Amount To Pay:</label>
+			  		<span id="dollor-sign">$</span>
+			  		<div class="col-sm-7">
+			  			<input class="form-control" type="text" name="amount" ng-model="amount" 
+			  				placeholder="The amount the pay (CAD)" ng-pattern="/^[0-9]+\.?[0-9]{0,2}$/" required>
+			  			<span class="glyphicon form-control-feedback" ng-class="{
+			  				'glyphicon-remove': credit_card_form.amount.$dirty && credit_card_form.amount.$invalid, 
+			  				'hidden': credit_card_form.amount.$pristine, 
+			  				'glyphicon-ok': credit_card_form.amount.$dirty && credit_card_form.amount.$valid
+			  				}">
+			  			</span>
+			  		</div>
+					</div>
+					<div class="form-group" ng-class="{
+			  			'has-error has-feedback': credit_card_form.firstname.$dirty && credit_card_form.firstname.$invalid, 
+			  			'has-success has-feedback': credit_card_form.firstname.$dirty && credit_card_form.firstname.$valid
+			  			}">
+			  		<label for="firstname" class="control-label col-sm-3">First Name:</label>
+			  		<div class="col-sm-7">
+			  			<input class="form-control" type="text" name="firstname" ng-model="firstname" 
+			  				placeholder="Your First Name" ng-pattern="/^[a-zA-Z]+$/" required>
+			  			<span class="glyphicon form-control-feedback" ng-class="{
+			  				'glyphicon-remove': credit_card_form.firstname.$dirty && credit_card_form.firstname.$invalid, 
+			  				'hidden': credit_card_form.firstname.$pristine, 
+			  				'glyphicon-ok': credit_card_form.firstname.$dirty && credit_card_form.firstname.$valid
+			  				}">
+			  			</span>
+			  		</div>
+					</div>
+					<div class="form-group" ng-class="{
+			  			'has-error has-feedback': credit_card_form.lastname.$dirty && credit_card_form.lastname.$invalid, 
+			  			'has-success has-feedback': credit_card_form.lastname.$dirty && credit_card_form.lastname.$valid
+			  			}">
+			  		<label for="lastname" class="control-label col-sm-3">Last Name:</label>
+			  		<div class="col-sm-7">
+			  			<input class="form-control" type="text" name="lastname" ng-model="lastname" 
+			  				placeholder="Your Last Name" ng-pattern="/^[a-zA-Z]+$/" required>
+			  			<span class="glyphicon form-control-feedback" ng-class="{
+			  				'glyphicon-remove': credit_card_form.lastname.$dirty && credit_card_form.lastname.$invalid, 
+			  				'hidden': credit_card_form.lastname.$pristine, 
+			  				'glyphicon-ok': credit_card_form.lastname.$dirty && credit_card_form.lastname.$valid
+			  				}">
+			  			</span>
+			  		</div>
+					</div>
+					<div class="form-group" ng-class="{
+			  			'has-error has-feedback': credit_card_form.cardNumber.$dirty && credit_card_form.cardNumber.$invalid, 
+			  			'has-success has-feedback': credit_card_form.cardNumber.$dirty && credit_card_form.cardNumber.$valid
+			  			}">
+			  		<label for="cardNumber" class="control-label col-sm-3">Card Number:</label>
+			  		<div class="col-sm-7">
+			  			<input class="form-control" type="text" name="cardNumber" ng-model="cardNumber" 
+			  				placeholder="Your credit card's number" ng-pattern="/^[0-9]{16}$/" required>
+			  			<span class="glyphicon form-control-feedback" ng-class="{
+			  				'glyphicon-remove': credit_card_form.cardNumber.$dirty && credit_card_form.cardNumber.$invalid, 
+			  				'hidden': credit_card_form.cardNumber.$pristine, 
+			  				'glyphicon-ok': credit_card_form.cardNumber.$dirty && credit_card_form.cardNumber.$valid
+			  				}">
+			  			</span>
+			  		</div>
+					</div>
+					<div class="form-group" ng-class="{
+			  			'has-error has-feedback': credit_card_form.expireMonth.$dirty && credit_card_form.expireMonth.$invalid ||
+			  			credit_card_form.expireYear.$dirty && credit_card_form.expireYear.$invalid, 
+			  			'has-success has-feedback': credit_card_form.expireMonth.$dirty && credit_card_form.expireMonth.$valid &&
+			  			credit_card_form.expireYear.$dirty && credit_card_form.expireYear.$valid
+			  			}">
+			  		<label for="expireMonth" class="control-label col-sm-3">Expired:</label>
+			  		<div class="col-sm-3">
+			  			<input class="form-control" type="text" name="expireMonth" ng-model="expireMonth" 
+			  				placeholder="MM" ng-pattern="/^[0-9]{2}$/" required>
+			  		</div>
+			  		<div class="col-sm-3">
+			  			<input class="form-control" type="text" name="expireYear" ng-model="expireYear" 
+			  				placeholder="YYYY" ng-pattern="/^[0-9]{4}$/" required>
+			  		</div>
+					</div>
+					<div class="form-group" ng-class="{
+			  			'has-error has-feedback': credit_card_form.cvv2.$dirty && credit_card_form.cvv2.$invalid, 
+			  			'has-success has-feedback': credit_card_form.cvv2.$dirty && credit_card_form.cvv2.$valid
+			  			}">
+			  		<label for="cvv2" class="control-label col-sm-3">CVV:</label>
+			  		<div class="col-sm-3">
+			  			<input class="form-control" type="text" name="cvv2" ng-model="cvv2" 
+			  				placeholder="CVV code is the last 3-digit numbers on the back of your card." ng-pattern="/^[0-9]{3}$/" required>
+			  		</div>
+					</div>
+					<div class="text-muted"><em>#Important: Your credit card's information will not be stored in this website.</em></div>
+				</div>
+				<div class="modal-footer">
+				<button class="btn btn-warning" type="button" ng-click="payByCreditCard()">Pay Now</button>
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</form>
+		</div>
+		<div class="modal-content" ng-show="isPaymentComplete">
+			<div class="modal-header">
+				<h3 class="text-success"><strong>Payment Complete!</strong></h3>
+			</div>
+			<div class="modal-body">
+				<div class="well well-sm"><em>
+					<p>Below is your invoice:</p>
+					<p>And a complete invoice by PayPal has been emailed to your email address.</p>
+				</em></div>
+				<p>Payment Completed for Payment Id: {{payment.id}}</p>
+				<p>Payment Status: {{payment.state}}</p>
+				<p>Create Time: {{payment.createTime}}</p>
+				<p>Update Time: {{payment.updateTime}}</p>
+				<div ng-repeat="(key, payer) in payment.payer.fundingInstruments">
+					<p><strong>Payer {{key+1}}:</strong></p> 
+					<p>Credit Card:</p>
+					<p>Type: {{payer.creditCard.type}}</p>
+					<p>Number: {{payer.creditCard.number}}</p>
+				</div>
+				<div ng-repeat="(key, transaction) in payment.transactions">
+					<p><strong>Item {{key+1}}:</strong></p>
+					<p>Amount: {{transaction.amount.total}} {{transaction.amount.currency}}</p>
+					<p>Description: {{transaction.description}}</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-info" ng-click="isPaymentComplete = false">Start A New Payment</button>
+				<button class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+</payment>

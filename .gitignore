@@ -1,6 +1,8 @@
-.classpath
-.project
-.settings/
-.springBeans
-target
+/.classpath
+/.project
+/.settings/
+/.springBeans
+/target/
 /bin/
+/resources/
+/src/main/resources/WEB-INF/.sass-cache/

@@ -1,5 +1,6 @@
 package ca.ams.models;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Student extends User{
 	private HashMap<String, String> completedCoursesAndGrades = new HashMap<String, String>();
 	@Transient
 	private List<Course> completedCourses = new ArrayList<Course>();
+	private BigDecimal tuition = new BigDecimal("6000.00");
 	
 	public List<CourseSection> getRegisteredSections() {
 		return registeredSections;
@@ -47,6 +49,12 @@ public class Student extends User{
 	public void setCompletedCoursesAndGrades(
 			HashMap<String, String> completedCoursesAndGrades) {
 		this.completedCoursesAndGrades = completedCoursesAndGrades;
+	}
+	public BigDecimal getTuition() {
+		return tuition;
+	}
+	public void setTuition(BigDecimal tuition) {
+		this.tuition = tuition;
 	}
 	
 }

@@ -120,4 +120,63 @@ directive('studentDetails', ['gradingSystem', function(gradingSystem) {
 			scope.earnCredits = gradingSystem.getCredits;
 		}
 	}
+}]).
+
+directive('payment', ['$http', 'userService', function($http, userService) {
+	return {
+		restrict: 'E',
+		scope: true,
+		link: function(scope, elem, attr) {
+			scope.user = userService.getUser;
+			var form = scope.credit_card_form;
+			
+			//set dirty to form field level
+			var setDirty = function(field) {
+				field.$dirty = true;
+				field.$pristine = false;
+			};
+
+			scope.isPaymentComplete = false;
+			scope.payment = '';
+			scope.cardType = '';
+
+			scope.payByCreditCard = function() {
+				setDirty(form.amount);
+				setDirty(form.firstname);
+				setDirty(form.lastname);
+				setDirty(form.cardNumber);
+				setDirty(form.expireMonth);
+				setDirty(form.expireYear);
+				setDirty(form.cvv2);
+
+				if(form.$valid && scope.cardType != '') {
+					$http.post('/api/payment/pay-by-credit-card', {
+						amount: form.amount.$viewValue,
+						type: scope.cardType,
+						firstName: form.firstname.$viewValue,
+						lastName: form.lastname.$viewValue,
+						number: form.cardNumber.$viewValue,
+						expireMonth: form.expireMonth.$viewValue,
+						expireYear: form.expireYear.$viewValue,
+						cvv2: form.cvv2.$viewValue
+					}).success(function(data, status) {
+						userService.updateUser();
+						scope.isPaymentComplete = true;
+						scope.payment = data;
+						scope.errorMessage = '';
+
+						scope.cardType = '';
+						scope.firstname = '';
+						scope.lastname = '';
+						scope.cardNumber = '';
+						scope.expireMonth = '';
+						scope.expireYear = '';
+						form.$setPristine();
+					}).error(function(data, status) {
+						scope.errorMessage = data.startsWith('Error:') ? data : '';
+					});	
+				}	
+			}
+		}
+	}
 }]);
