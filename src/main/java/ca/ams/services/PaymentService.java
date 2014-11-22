@@ -157,8 +157,8 @@ public class PaymentService {
 		payment.setPayer(payer);
 		payment.setTransactions(transactions);
 		RedirectUrls redirectUrls = new RedirectUrls();
-		redirectUrls.setCancelUrl("https://localhost:8081/api/payment/paypal/paypal-account?success=false");
-		redirectUrls.setReturnUrl("https://localhost:8081/api/payment/paypal/paypal-account?success=true");
+		redirectUrls.setCancelUrl("https://ams.vincent-tech.com/api/payment/paypal/paypal-account?success=false");
+		redirectUrls.setReturnUrl("https://ams.vincent-tech.com/api/payment/paypal/paypal-account?success=true");
 		payment.setRedirectUrls(redirectUrls);
 
 		try {
