@@ -35,6 +35,7 @@ public class AdminService {
 		Student student1 = createStudent1();
 		createStudent2();
 		createGPD1();
+		createRegistrar1();
 		
 		Timeslot timeslot1 = new Timeslot();
 		timeslot1.setStartTime("17:45");
@@ -132,6 +133,18 @@ public class AdminService {
 		student1.getCompletedCoursesAndGrades().put(course3.getId(), Grade.A.toString());
 		student1.getCompletedCoursesAndGrades().put(course4.getId(), Grade.Bplus.toString());
 		studentRepos.save(student1);
+	}
+
+	private Registrar createRegistrar1() {
+		Registrar registrar = new Registrar();
+		registrar.setUsername("halina");
+		registrar.setPassword("111111a");
+		userService.encryptPassword(registrar);
+		registrar.setEmail("halina@cs.concordia.ca");
+		registrar.setRole(Role.ROLE_REGISTRAR);
+		registrar.setPhoneNumber("514-848-2424 ext3043");
+		registrar.setName("Halina Monkiewicz");
+		return registrarRepos.save(registrar);
 	}
 
 	public Student createStudent1() {

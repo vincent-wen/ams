@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 import ca.ams.services.*;
 
@@ -13,24 +12,28 @@ import ca.ams.services.*;
 public class AppController {
 	@Autowired
 	private AdminService adminService;
+	@Autowired
+	private UserService userService;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public ModelAndView home() {
-		return new ModelAndView("index");
+	public String home() {
+		if(userService.getCurrentUser() == null) return "redirect:/login";
+		return "index";
 	}
 	
 	@RequestMapping(value = "/api/partials/{pageName}", method = RequestMethod.GET)
-	public ModelAndView mainPage(@PathVariable String pageName) {
-		return new ModelAndView("partials/" + pageName);
+	public String partialPages(@PathVariable String pageName) {
+		if(userService.getCurrentUser() == null) return "redirect:/login";
+		return "partials/" + pageName;
 	}
 	
 	@RequestMapping(value = "/{pageName}", method = RequestMethod.GET)
-	public ModelAndView others1(@PathVariable String pageName) {
-		return new ModelAndView("index");
+	public String others1(@PathVariable String pageName) {
+		return home();
 	}
 	@RequestMapping(value = "/payment/paypal/{pageName}", method = RequestMethod.GET)
-	public ModelAndView others2(@PathVariable String pageName) {
-		return new ModelAndView("index");
+	public String others2(@PathVariable String pageName) {
+		return home();
 	}
 	
 	@RequestMapping("/init")

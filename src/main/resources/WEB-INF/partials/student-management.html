@@ -4,13 +4,12 @@
 
 		<!-- Search Bar -->
 		<div class="input-group-btn">
-			<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">Search <span class="caret"></span></button>
+			<button type="button" class="btn btn-warning dropdown-toggle no-radius" data-toggle="dropdown">Search <span class="caret"></span></button>
 			<ul class="dropdown-menu dropdown-menu-right" role="menu">
 				<li><a href="" ng-click="searchById()">Search Student by Id</a></li>
 				<li><a href="" ng-click="searchByName()">Search Student by Name</a></li>
-				<li class="divider"></li>
-				<li><a href="" ng-click="searchAll()">Search All Students</a></li>
 			</ul>
+			<button type="button" class="btn btn-info" ng-click="searchAll()">List All</button>
 		</div>
 	</div>
 
@@ -32,7 +31,7 @@
 				<td>{{student.email}}</td>
 				<td>{{student.program}}</td>
 				<td>
-					<a href="" ng-click="showStudentDetails(student)" ><span class="label label-default">View details</span></a>
+					<a href="" ng-click="showStudentDetails(student)" ><span class="label label-warning">View details</span></a>
 				</td>
 			</tr>
 		</table>	

@@ -122,15 +122,16 @@ directive('studentDetails', ['gradingSystem', function(gradingSystem) {
 	}
 }]).
 
-directive('payment', ['$http', '$window', 'userService', function($http, $window, userService) {
-	return {
-		restrict: 'E',
-		scope: true,
-		link: function(scope, elem, attr) {
-			scope.user = userService.getUser;
-			var form = scope.credit_card_form;
-			var accountForm = scope.paypal_account_form;
-			
+directive('payment', ['$http', '$window', 'userService',
+	function($http, $window, userService, formatErrorFilter) {
+		return {
+			restrict: 'E',
+			scope: true,
+			link: function(scope, elem, attr) {
+				scope.user = userService.getUser;
+				var form = scope.credit_card_form;
+				var accountForm = scope.paypal_account_form;
+
 			//set dirty to form field level
 			var setDirty = function(field) {
 				field.$dirty = true;
@@ -174,8 +175,7 @@ directive('payment', ['$http', '$window', 'userService', function($http, $window
 						scope.expireYear = '';
 						form.$setPristine();
 					}).error(function(data, status) {
-						var err = 'Error:';
-						scope.errorMessage = data.slice(0, err.length) == err ? data : '';
+						scope.errorMessage = data;
 					});	
 				}	
 			}
@@ -184,19 +184,65 @@ directive('payment', ['$http', '$window', 'userService', function($http, $window
 				setDirty(form.amount);
 				if(accountForm.$valid) {
 					$http.post('/api/payment/paypal/paypal-account', form.amount.$viewValue
-					).success(function(data, status) {
-						scope.payment = data;
-						scope.errorMessage = '';
-						for(var i=0; i<data.links.length; i++) {
-							if(data.links[i].rel == 'approval_url') {
-								$window.open(data.links[i].href);
+						).success(function(data, status) {
+							scope.payment = data;
+							scope.errorMessage = '';
+							for(var i=0; i<data.links.length; i++) {
+								if(data.links[i].rel == 'approval_url') {
+									$window.open(data.links[i].href);
+								}
 							}
-						}
-						
+
+						}).error(function(data, status) {
+							scope.errorMessage = data;
+						});	
+					}
+				}
+			}
+		}
+	}]).
+
+directive('inquiry', ['$http', 'userService', 
+	function($http, userService) {
+		return {
+			restrict: 'E',
+			scope: true,
+			link: function(scope, elem, attr) {
+				var form = scope.inquiry_form;
+				scope.isComplete = false;
+
+			//set dirty to form field level
+			var setDirty = function(field) {
+				field.$dirty = true;
+				field.$pristine = false;
+			};
+
+			scope.inquiry = function(event) {
+				console.log('message');
+				event.preventDefault();
+
+				setDirty(form.title);
+				setDirty(form.email);
+				setDirty(form.content);
+
+				if(form.$valid) {
+					$http.post('/api/inquiry', {
+						title: form.title.$viewValue,
+						email: form.email.$viewValue,
+						content: form.content.$viewValue,
+					}).success(function(data, status) {
+						scope.successMessage = data;
+						scope.errorMessage = '';
+						scope.isComplete = true;
+
+						scope.title = '';
+						scope.email = '';
+						scope.content = '';
+						form.$setPristine();
 					}).error(function(data, status) {
-						var err = 'Error:';
-						scope.errorMessage = data.slice(0, err.length) == err ? data : '';
-					});	
+						scope.errorMessage = data;
+						scope.successMessage = '';
+					});
 				}
 			}
 		}

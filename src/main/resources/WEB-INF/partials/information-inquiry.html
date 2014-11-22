@@ -1,1 +1,63 @@
-<h3>Information Inquiry</h3>
+<h3 class="text-light">Information Inquiry</h3>
+<inquiry>
+	<div class="panel panel-default col-sm-10">
+		<div class="panel-body" ng-hide="isComplete">
+			<form class="form-horizontal" name="inquiry_form" role="form" method="POST" ng-submit="inquiry($event)" novalidate>
+				<div class="form-group" ng-class="{
+						'has-error has-feedback': inquiry_form.title.$dirty && inquiry_form.title.$invalid, 
+						'has-success has-feedback': inquiry_form.title.$dirty && inquiry_form.title.$valid
+					}">
+					<label for="title" class="control-label col-sm-2">Title:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="title" ng-model="title" 
+						placeholder="Title of the inquiry (maximun 50 characters)" ng-pattern="/^[\w\.\-\_\s]{1,50}$/" required>
+						<span class="glyphicon form-control-feedback" ng-class="{
+							'glyphicon-remove': inquiry_form.title.$dirty && inquiry_form.title.$invalid, 
+							'hidden': inquiry_form.title.$pristine, 
+							'glyphicon-ok': inquiry_form.title.$dirty && inquiry_form.title.$valid
+						}">
+						</span>
+					</div>
+				</div>
+				<div class="form-group" ng-class="{
+						'has-error has-feedback': inquiry_form.email.$dirty && inquiry_form.email.$invalid, 
+						'has-success has-feedback': inquiry_form.email.$dirty && inquiry_form.email.$valid
+					}">
+						<label for="email" class="control-label col-sm-2">Email:</label>
+						<div class="col-sm-10">
+							<input class="form-control" type="text" name="email" ng-model="email" 
+							placeholder="Your email address to be replied (optional)" ng-pattern="/^[a-zA-Z]+[\w\.\-\_]*@[\w\.\-\_]+\.[a-zA-Z]+$/">
+							<span class="glyphicon form-control-feedback" ng-class="{
+								'glyphicon-remove': inquiry_form.email.$dirty && inquiry_form.email.$invalid, 
+								'hidden': inquiry_form.email.$pristine, 
+								'glyphicon-ok': inquiry_form.email.$dirty && inquiry_form.email.$valid
+							}">
+							</span>
+						</div>
+						<div class="text-warning" id="email-explain"><em>If email is not given, your default email addree will be used.</em></div>
+				</div>
+				<div class="form-group" ng-class="{
+						'has-error has-feedback': inquiry_form.content.$dirty && inquiry_form.content.$invalid, 
+						'has-success has-feedback': inquiry_form.content.$dirty && inquiry_form.content.$valid
+					}">
+					<label for="content" class="control-label col-sm-2">Content:</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" name="content" ng-model="content" row="8"
+						placeholder="Main Content is written here... (maximun 1000 characters)" ng-pattern="/^.{1,1000}$/" required></textarea>
+						<span class="glyphicon form-control-feedback" ng-class="{
+							'glyphicon-remove': inquiry_form.content.$dirty && inquiry_form.content.$invalid, 
+							'hidden': inquiry_form.content.$pristine, 
+							'glyphicon-ok': inquiry_form.content.$dirty && inquiry_form.content.$valid
+						}">
+						</span>
+					</div>
+				</div>
+				<button class="btn btn-info col-sm-offset-2" type="submit">Submit</button>
+			</form>
+		</div>
+		<div class="panel-body" ng-show="isComplete">
+			<div class="text-success">{{successMessage}}</div>
+			<button class="btn btn-success" type="button" ng-click="isComplete = false">Start another inquiry</button>
+		</div>
+	</div>
+</inquiry>

@@ -16,7 +16,7 @@
 						<button class="btn btn-default" type="button" ng-click="switchEditMode('editPhoneNumberMode')"><span class="glyphicon glyphicon-remove"></span></button>
 					</span>
 				</span>
-				<span class="text-danger">{{phoneNumberError}}</span>
+				<span class="text-danger">{{phoneNumberError | formatError}}</span>
 			</span>
 			<a href="" ng-click="switchEditMode('editPhoneNumberMode')" ng-hide="editPhoneNumberMode"><span class="glyphicon glyphicon-pencil"></span></a>
 		</li>
@@ -31,7 +31,7 @@
 						<button class="btn btn-default" type="button" ng-click="switchEditMode('editEmailMode')"><span class="glyphicon glyphicon-remove"></span></button>
 					</span>
 				</span>
-				<span class="text-danger">{{emailError}}</span>
+				<span class="text-danger">{{emailError | formatError}}</span>
 			</span>
 			<a href="" ng-click="switchEditMode('editEmailMode')" ng-hide="editEmailMode"><span class="glyphicon glyphicon-pencil"></span></a>
 		</li>
@@ -85,7 +85,7 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<h4>Select a new course Section</h4>
-					<div class="text-danger">{{changeSectionError}}</div>
+					<div class="text-danger">{{changeSectionError | formatError}}</div>
 					<div class="list-group">
 						<a href="" class="list-group-item" ng-click="chooseSection($event, section)" ng-repeat="section in sections" ng-class="{disabled:registerSectionId == section.id}">
 							<p>Time: {{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</p>

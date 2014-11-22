@@ -1,9 +1,12 @@
-<div class="col-sm-3" id="left-panel">
-<ul class="nav nav-pills nav-stacked">
+<div class="col-sm-3" id="left-panel" ng-init="showContent()">
+	<ul class="nav nav-pills nav-stacked">
 		<li><a href="/course" data-toggle="pill">Course Management</a></li>
 		<li ng-hide="user().role == 'Student'"><a href="/student" data-toggle="pill">Student Management</a></li>
 		<li><a href="/profile" data-toggle="pill">Profile Display</a></li>
 		<li ng-show="user().role == 'Student'"><a href="/payment" data-toggle="pill">Tuition Payment</a></li>
-		<li ng-show="user().role == 'Student' || user().role == 'Professor'"><a href="/inquiry" data-toggle="pill">Informatioin Inquiry</a></li>
+		<li>
+			<a href="/inquiry" data-toggle="pill" ng-show="user().role == 'Student' || user().role == 'Professor'">Informatioin Inquiry</a>
+			<a href="/inquiries" data-toggle="pill" ng-show="user().role == 'Registrar'">View Inquiries</a>
+		</li>
 	</ul>
 </div>

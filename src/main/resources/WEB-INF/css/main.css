@@ -138,27 +138,52 @@ table.table {
   background: #428bca;
 }
 
-/* line 117, ../sass/main.scss */
+/* line 115, ../sass/main.scss */
+#email-explain {
+  float: left;
+  padding: 4px 0 0 106px;
+}
+
+/* line 120, ../sass/main.scss */
+.input-group-btn > .btn.no-radius {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* line 129, ../sass/main.scss */
 .ng-enter, .ng-hide-remove {
   -webkit-transition: 0.5s ease-out all;
   transition: 0.5s ease-out all;
 }
 
-/* line 122, ../sass/main.scss */
+/* line 135, ../sass/main.scss */
+#topnav, #main-content,
 .ng-show {
   -webkit-transition: 1s ease-out all;
   transition: 1s ease-out all;
 }
 
-/* line 126, ../sass/main.scss */
+/* line 142, ../sass/main.scss */
+#topnav, #main-content,
 .ng-enter, .ng-hide {
   opacity: 0;
 }
 
 /* starting animations */
-/* line 127, ../sass/main.scss */
+/* line 143, ../sass/main.scss */
 .ng-enter.ng-enter-active {
   opacity: 1;
 }
 
 /* terminal animations*/
+/* 
+  Allow angular.js to be loaded in body, hiding cloaked elements until 
+  templates compile.  The !important is important given that there may be 
+  other selectors that are more specific or come later and might alter display.  
+ */
+/* line 150, ../sass/main.scss */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}

@@ -12,10 +12,14 @@ controller('AppCtrl', ['$scope', 'userService', '$window',
 			$window.location.href = "/logout";
 		}
 
+		$scope.showContent = function() {
+			angular.element('#main-content').css("opacity", 1);
+			angular.element('#topnav').css("opacity", 1);
+		}
 	}]).
 
-controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', 'gradingSystem',
-	function($scope, $http, userService, timeslotService, gradingSystem){
+controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', 'gradingSystem', 'formatErrorFilter',
+	function($scope, $http, userService, timeslotService, gradingSystem, formatErrorFilter){
 		$scope.weekdayPreference = {
 			Monday: true,
 			Tuesday: true,
@@ -40,39 +44,46 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 		$scope.instructor = [];
 		$scope.chosen = {};
 
+		$scope.searchError = '';
+		$scope.registerError = '';
+		$scope.registerSuccess = '';
+
 		$scope.searchById = function() {
+			$scope.searchError = '';
 			$scope.registerError = '';
 			$scope.registerSuccess = '';
 			$http.post('/api/course/search-by-id', $scope.courseNameorId)
 			.success(function(data, status) {
 				$scope.courses = data;
-			})
-			.error(function(data, status) {
-				console.log(data);
-			})
+				if($scope.courses.length == 0) {
+					$scope.searchError = "No corresponding course is found. Please try again.";
+				} 
+			});
 		}
 
 		$scope.searchByName = function() {
+			$scope.searchError = '';
 			$scope.registerError = '';
 			$scope.registerSuccess = '';
 			$http.post('/api/course/search-by-name', $scope.courseNameorId)
 			.success(function(data, status) {
 				$scope.courses = data;
-			})
-			.error(function(data, status) {
-				console.log(data);
+				if($scope.courses.length == 0) {
+					$scope.searchError = "No corresponding course is found. Please try again.";
+				} 
 			})
 		}
 
 		$scope.searchAll = function() {
+			$scope.searchError = '';
 			$scope.registerError = '';
 			$scope.registerSuccess = '';
 			$http.post('/api/course/search-all')
 			.success(function(data, status) {
 				$scope.courses = data;
-			})
-			.error(function(data, status) {
-				console.log(data);
+				if($scope.courses.length == 0) {
+					$scope.searchError = "No corresponding course is found. Please try again.";
+				} 
 			})
 		}
 
@@ -98,7 +109,6 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			.error(function(data, status) {
 				$scope.registerError = data;
 				$scope.registerSuccess = '';
-				console.log(data);
 			})
 		}
 
@@ -111,9 +121,6 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			}
 			$http.post(url, value).success(function(data, status) {
 				$scope.students = data;
-			})
-			.error(function(data, status) {
-				console.log(data);
 			})
 		}
 
@@ -133,7 +140,6 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			.error(function(data, status) {
 				$scope.registerError = data;
 				$scope.registerSuccess = '';
-				console.log(data);
 			})
 		}
 
@@ -156,9 +162,6 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 					}
 				}
 			})
-			.error(function(data, status) {
-				console.log(data);
-			})
 		}
 
 		$scope.showCourseDescription = function(course) {
@@ -177,10 +180,6 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 				angular.element('#enrolled-students').modal({
 					backdrop: 'static'
 				}).modal('show');
-				console.log(data);
-			})
-			.error(function(data, status) {
-				console.log(data);
 			})
 		}
 
@@ -207,11 +206,9 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 				errorContainer.html('');
 				section.instructor.name = $scope.instructor[key][id];
 				$scope.switchMode('instructorMode', key, id);
-				console.log(data);
 			})
 			.error(function(data, status) {
-				errorContainer.html(data);
-				console.log(data);
+				errorContainer.html(formatErrorFilter(data));
 			})
 		}
 
@@ -247,7 +244,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 				$scope.switchMode('timeMode', key, id);
 			})
 			.error(function(data, status) {
-				errorContainer.html(data);
+				errorContainer.html(formatErrorFilter(data));
 			})
 		}
 
@@ -267,8 +264,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 				$scope.switchMode('locationMode', key, id);
 			})
 			.error(function(data, status) {
-				console.log(errorContainer);
-				errorContainer.html(data);
+				errorContainer.html(formatErrorFilter(data));
 			})
 		}
 
@@ -277,8 +273,6 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			var section = $scope.courses[key].courseSections[id];
 			var capacity = angular.element(event.currentTarget).parent().siblings('input[name="capacity"]');
 			var errorContainer = capacity.parent().siblings('.text-danger');
-			console.log(parseInt(capacity.val()));
-			console.log(capacity.val());
 			if(capacity.val() != parseInt(capacity.val())) {
 				errorContainer.html('Capacity must be an integer between 10 to 300.');
 				return;
@@ -294,8 +288,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 				$scope.switchMode('capacityMode', key, id);
 			})
 			.error(function(data, status) {
-				console.log(errorContainer);
-				errorContainer.html(data);
+				errorContainer.html(formatErrorFilter(data));
 			})
 		}
 
@@ -404,9 +397,6 @@ controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 				userService.updateUser();
 				angular.element('#confirm-drop-course').modal('hide');
 			})
-			.error(function(data, status) {
-				console.log(data);
-			})
 		}
 	}]).
 
@@ -416,13 +406,9 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 		$scope.chosenStudent = {};
 
 		$scope.searchById = function() {
-			console.log($scope.studentNameorId);
 			$http.post('/api/student/search-by-id', $scope.studentNameorId)
 			.success(function(data, status) {
 				$scope.students = data;
-			})
-			.error(function(data, status) {
-				console.log(data);
 			})
 		}
 
@@ -431,18 +417,12 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 			.success(function(data, status) {
 				$scope.students = data;
 			})
-			.error(function(data, status) {
-				console.log(data);
-			})
 		}
 
 		$scope.searchAll = function() {
 			$http.post('/api/student/search-all', {})
 			.success(function(data, status) {
 				$scope.students = data;
-			})
-			.error(function(data, status) {
-				console.log(data);
 			})
 		}
 
@@ -476,4 +456,16 @@ controller('paymentCtrl', ['$scope', '$routeParams', '$location', 'paymentResult
 			default: break;
 		}
 		$location.url('/payment');
+	}]).
+
+controller('inquiryCtrl', ['$scope', 'inquiryService', function($scope, inquiryService){
+	$scope.inquiries = inquiryService.get;
+	$scope.chosenInquiry = {};
+
+	$scope.inquiryDetails = function(inquiry) {
+		$scope.chosenInquiry = inquiry;
+		angular.element('#inquiry-details').modal({
+			backdrop: 'static'
+		}).show();
+	}
 }]);

@@ -13,14 +13,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Inquiry {
 	@Id
 	protected String id;
-	private String userId;
+	private String authorId;
 	private Role role;
 	private String title;
-	private Long content;
+	private String content;
 	private Date date;
 	@Transient
-	private String username;
-	@Transient
+	private String author;
 	private String email;
 	@Transient
 	private String phoneNumber;
@@ -30,11 +29,11 @@ public class Inquiry {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getUserId() {
-		return userId;
+	public String getAuthorId() {
+		return authorId;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
 	}
 	public Role getRole() {
 		return role;
@@ -48,10 +47,10 @@ public class Inquiry {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public Long getContent() {
+	public String getContent() {
 		return content;
 	}
-	public void setContent(Long content) {
+	public void setContent(String content) {
 		this.content = content;
 	}
 	public Date getDate() {
@@ -60,11 +59,11 @@ public class Inquiry {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-	public String getUsername() {
-		return username;
+	public String getAuthor() {
+		return author;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 	public String getEmail() {
 		return email;

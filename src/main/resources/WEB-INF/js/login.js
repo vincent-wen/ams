@@ -42,4 +42,14 @@ angular.module('login', ['ngAnimate'])
     field.$dirty = true;
     field.$pristine = false;
   };
-}]);
+}]).
+
+filter('formatError', function() {
+	var err = "Error: ";
+	return function(error) {
+		if(error.slice(0, err.length) == err) {
+			return error.slice(err.length);
+		}
+		return '';
+	}
+});

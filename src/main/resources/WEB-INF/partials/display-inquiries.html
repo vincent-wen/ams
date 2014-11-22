@@ -1,0 +1,41 @@
+<div ng-controller="inquiryCtrl">
+	<h3 class="text-light">View Inquiries</h3>
+	<table class="table table-striped">
+  	<tr>
+  		<th></th>
+  		<th>Title</th>
+  		<th>Brief Content</th>
+			<th>Post Time</th>
+			<th>Author</th>
+			<th></th>
+  	</tr>
+  	<tr ng-repeat="inquiry in inquiries()">
+  		<td>new</td>
+  		<td>{{inquiry.title | limitTo : 50}}<span ng-show="inquiry.title.length > 50">...</span></td>
+  		<td>{{inquiry.content | limitTo : 50}}<span ng-show="inquiry.content.length > 50">...</span></td>
+  		<td>{{inquiry.date | date : 'MMM dd HH:mm'}}</td>
+  		<td><a href="" data-toggle="tooltip" data-placement="right" title="Email: {{inquiry.email}}&#10Phone Number: {{inquiry.phoneNumber}}">{{inquiry.author}}</a></td>
+  		<td><a href="" ng-click="inquiryDetails(inquiry)"><span class="label label-info">Read More</span></a></td>
+  	</tr>
+	</table>
+	<div class="modal fade" role="dialog" id="inquiry-details" aria-labelledby="inquiryDetailsLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4>Inquiry Details</h4>
+				</div>
+				<div class="modal-body">
+					<p><strong>Title: </strong>{{chosenInquiry.title}}</p>
+					<p><strong>Post Time: </strong>{{chosenInquiry.date | date : 'MMM dd HH:mm'}}</p>
+					<p><strong>Author: </strong><a href="" data-toggle="tooltip" data-placement="right" title="Email: {{inquiry.email}}&#10Phone Number: {{inquiry.phoneNumber}}">{{chosenInquiry.author}}</a></p>
+					<p><strong>Content: </strong><br>{{chosenInquiry.content}}</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	

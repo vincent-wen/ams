@@ -127,5 +127,22 @@ service('paymentResult', function() {
 			}, 5000);
 		}
 	}
-});
+}).
+
+service('inquiryService', ['$http', function($http) {
+	var inquires = [];
+	var update = function() {
+		$http.post('/api/inquiry/all').success(function(data) {
+			inquires = data;
+		})
+	}
+	update();
+	// update every minute
+	setInterval(function(){
+		update();
+	}, 60000);
+	return {
+		get: function() {return inquires;}
+	}
+}]);
 

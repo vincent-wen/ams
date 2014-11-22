@@ -53,7 +53,7 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<h4>Input your credit card's information</h4>
-					<div class="text-danger">{{errorMessage}}</div>
+					<div class="text-danger">{{errorMessage | formatError}}</div>
 				</div>
 				<form class="form-horizontal" name="credit_card_form" role="form" method="POST" novalidate>
 					<div class="modal-body">
@@ -212,7 +212,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 						<h4>Input the amount you want to pay</h4>
-						<div class="text-danger">{{errorMessage}}</div>
+						<div class="text-danger">{{errorMessage | formatError}}</div>
 						<div class="form-group" ng-class="{
 				  			'has-error has-feedback': paypal_account_form.amount.$dirty && paypal_account_form.amount.$invalid, 
 				  			'has-success has-feedback': paypal_account_form.amount.$dirty && paypal_account_form.amount.$valid

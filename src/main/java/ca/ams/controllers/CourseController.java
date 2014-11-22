@@ -61,17 +61,17 @@ public class CourseController {
 
 			// Handle exceptions before modifications
 			if(section == null)
-				return new ResponseEntity<String>("Section not found.", HttpStatus.NOT_FOUND);
+				return new ResponseEntity<String>("Error: Section not found.", HttpStatus.NOT_FOUND);
 			if(newTimeslot == null)
-				return new ResponseEntity<String>("The timeslot is not found.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The timeslot is not found.", HttpStatus.NOT_ACCEPTABLE);
 			if(weekday == null)
-				return new ResponseEntity<String>("The weekday is not valid.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The weekday is not valid.", HttpStatus.NOT_ACCEPTABLE);
 			if(section.getTimeslot().equals(newTimeslot) && section.getWeekday().equals(weekday))
-				return new ResponseEntity<String>("The time is already set.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The time is already set.", HttpStatus.NOT_ACCEPTABLE);
 			
 			Professor professor = professorService.getProfessorById(section.getInstructorId());
 			if(professorService.isTimeConflictForProfessor(professor, newTimeslot, weekday))
-				return new ResponseEntity<String>("The time is conflit to another course of the same instructor.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The time is conflit to another course of the same instructor.", HttpStatus.NOT_ACCEPTABLE);
 			
 			// Process modifications
 			section.setTimeslot(newTimeslot);
@@ -79,7 +79,7 @@ public class CourseController {
 			courseService.save(section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value="/api/section/change-instructor", method = RequestMethod.POST)
@@ -92,13 +92,13 @@ public class CourseController {
 			
 			// Handle exceptions before modifications
 			if(section == null)
-				return new ResponseEntity<String>("Section not found.", HttpStatus.NOT_FOUND);
+				return new ResponseEntity<String>("Error: Section not found.", HttpStatus.NOT_FOUND);
 			if(newInstructor == null)
-				return new ResponseEntity<String>("Professor not found.", HttpStatus.NOT_FOUND);
+				return new ResponseEntity<String>("Error: Professor not found.", HttpStatus.NOT_FOUND);
 			if(professorService.ifSectionAlreadyRegistered(newInstructor, section))
-				return new ResponseEntity<String>("The professor have already been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The professor have already been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(professorService.ifSectionsConflict(newInstructor, section))
-				return new ResponseEntity<String>("Time is conflict with another course section for this professor.", HttpStatus.CONFLICT);
+				return new ResponseEntity<String>("Error: Time is conflict with another course section for this professor.", HttpStatus.CONFLICT);
 			
 			// Process modifications
 			Professor oldInstructor = professorService.getProfessorById(section.getInstructorId());
@@ -110,7 +110,7 @@ public class CourseController {
 			courseService.save(section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value="/api/section/change-location", method = RequestMethod.POST)
@@ -122,16 +122,16 @@ public class CourseController {
 
 			// Handle exceptions before modifications
 			if(section == null)
-				return new ResponseEntity<String>("Course section not found.", HttpStatus.NOT_FOUND);
+				return new ResponseEntity<String>("Error: Course section not found.", HttpStatus.NOT_FOUND);
 			if(!courseService.validateLocation(courseSection.getLocation()))
-				return new ResponseEntity<String>("The format of location is invalid.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The format of location is invalid.", HttpStatus.NOT_ACCEPTABLE);
 
 			// Process modifications
 			section.setLocation(courseSection.getLocation());
 			courseService.save(section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value="/api/section/change-capacity", method = RequestMethod.POST)
@@ -143,18 +143,18 @@ public class CourseController {
 
 			// Handle exceptions before modifications
 			if(section == null)
-				return new ResponseEntity<String>("Course section not found.", HttpStatus.NOT_FOUND);
+				return new ResponseEntity<String>("Error: Course section not found.", HttpStatus.NOT_FOUND);
 			if(!courseService.validateCapacity(courseSection.getCapacity()))
-				return new ResponseEntity<String>("Capacity must be an integer between 10 to 300.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: Capacity must be an integer between 10 to 300.", HttpStatus.NOT_ACCEPTABLE);
 			if(courseService.ifEnrolledStudentsMoreThanCapacity(section, courseSection.getCapacity()))
-				return new ResponseEntity<String>("Capacity must be bigger than the number of students who have been enrolled in this course section.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: Capacity must be bigger than the number of students who have been enrolled in this course section.", HttpStatus.NOT_ACCEPTABLE);
 
 			// Process modifications
 			section.setCapacity(courseSection.getCapacity());
 			courseService.save(section);
 			return new ResponseEntity<String>("success", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Forbidden Request.", HttpStatus.FORBIDDEN);
+		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "/api/section/get-enrolled-students", method = RequestMethod.POST)

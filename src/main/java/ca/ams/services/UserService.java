@@ -73,6 +73,7 @@ public class UserService {
 	
 	public User getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if(auth == null) return null;
 		Role userRole = Role.valueOf(getUserRole());
 		User currentUser = null;
 		switch(userRole) {
@@ -87,6 +88,7 @@ public class UserService {
 	
 	public String getUserRole() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if(auth == null) return null;
 		for(GrantedAuthority authority : auth.getAuthorities()) {
 			return authority.getAuthority();
 		}

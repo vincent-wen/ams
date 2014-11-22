@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import ca.ams.models.*;
 import ca.ams.services.*;
@@ -30,9 +29,9 @@ public class UserController {
 	private CourseService courseService;
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ModelAndView loginPage() {
-		if(userService.getCurrentUser() != null) return new ModelAndView("index");
-		return new ModelAndView("login");
+	public String loginPage() {
+		if(userService.getCurrentUser() != null) return "redirect:/";
+		return "login";
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -44,12 +43,12 @@ public class UserController {
 				try {
 					HttpHeaders headers = new HttpHeaders();
 					headers.setLocation(new URI("/"));
-					return new ResponseEntity<String>("success", headers, HttpStatus.MOVED_PERMANENTLY);
+					return new ResponseEntity<String>("Login is successful.", headers, HttpStatus.MOVED_PERMANENTLY);
 				}catch(URISyntaxException e) { e.printStackTrace(); }
 			}
-			return new ResponseEntity<String>("The password is not correct", HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<String>("Error: The password is not correct", HttpStatus.UNAUTHORIZED);
 		}
-		return new ResponseEntity<String>("The user is not found", HttpStatus.NOT_FOUND);
+		return new ResponseEntity<String>("Error: The user is not found", HttpStatus.NOT_FOUND);
 	}
 	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
@@ -75,36 +74,36 @@ public class UserController {
 		User currentUser = userService.getCurrentUser();
 		
 		if(currentUser == null) {
-			return new ResponseEntity<String>("Login expired", HttpStatus.FORBIDDEN);
+			return new ResponseEntity<String>("Error: Login expired", HttpStatus.FORBIDDEN);
 		}
 		if(!userService.isPasswordValid(currentUser.getPassword(), oldPassword)) {
-			return new ResponseEntity<String>("Your old password is incorrect.", HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<String>("Error: Your old password is incorrect.", HttpStatus.NOT_ACCEPTABLE);
 		}
 		if(!userService.validatePasswordPattern(newPassword)) {
-			return new ResponseEntity<String>("Your new password is not acceptable.", HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<String>("Error: Your new password is not acceptable.", HttpStatus.NOT_ACCEPTABLE);
 		}
 		userService.updatePassword(currentUser, newPassword);
-		return new ResponseEntity<String>("success", HttpStatus.OK);
+		return new ResponseEntity<String>("Password is changed successfully.", HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/api/user/change-phone-number", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> changePhoneNumber(@RequestBody String phoneNumber) {
 		User currentUser = userService.getCurrentUser();
 		if(!userService.validatePhoneNumber(phoneNumber))
-			return new ResponseEntity<String>("The format of your phone number is invalid.", HttpStatus.NOT_ACCEPTABLE);;
+			return new ResponseEntity<String>("Error: The format of your phone number is invalid.", HttpStatus.NOT_ACCEPTABLE);;
 		currentUser.setPhoneNumber(phoneNumber);
 		userService.save(currentUser);
-		return new ResponseEntity<String>("success", HttpStatus.OK);
+		return new ResponseEntity<String>("Phone number is changed successfully.", HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/api/user/change-email", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<String> changeEmail(@RequestBody String email) {
 		User currentUser = userService.getCurrentUser();
 		if(!userService.validateEmail(email))
-			return new ResponseEntity<String>("The format of your email is invalid", HttpStatus.NOT_ACCEPTABLE);;
+			return new ResponseEntity<String>("Error: The format of your email is invalid", HttpStatus.NOT_ACCEPTABLE);;
 		currentUser.setEmail(email);;
 		userService.save(currentUser);
-		return new ResponseEntity<String>("success", HttpStatus.OK);
+		return new ResponseEntity<String>("Email is changed successfully.", HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/api/user/get-all-professors", method = RequestMethod.POST)

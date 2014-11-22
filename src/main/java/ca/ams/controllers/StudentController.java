@@ -75,22 +75,22 @@ public class StudentController {
 			Student student = (Student) user;
 			
 			if(studentService.ifSectionAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyCompleted(student, section))
-				return new ResponseEntity<String>("This course has already been completed.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: This course has already been completed.", HttpStatus.NOT_ACCEPTABLE);
 			if(!studentService.ifPrerequsitesFulfilled(student, section))
-				return new ResponseEntity<String>("You haven't fulfilled the prerequisites of the course.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: You haven't fulfilled the prerequisites of the course.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("You can not register for the same course twice within the same semester.", HttpStatus.CONFLICT);
+				return new ResponseEntity<String>("Error: You can not register for the same course twice within the same semester.", HttpStatus.CONFLICT);
 			if(studentService.ifSectionsConflict(student, section, false))
-				return new ResponseEntity<String>("Time is conflict with another course.", HttpStatus.CONFLICT);
+				return new ResponseEntity<String>("Error: Time is conflict with another course.", HttpStatus.CONFLICT);
 			if(courseService.isSectionFull(section))
-				return new ResponseEntity<String>("This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
 			
 			studentService.registerSection(student, section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("Registration is successful.", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Illegal Operation", HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<String>("Error: Illegal Operation", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/register-course/{studentId}", method = RequestMethod.POST)
@@ -101,14 +101,14 @@ public class StudentController {
 			Student student = studentService.getStudentById(studentId);
 			
 			if(studentService.ifSectionAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("The Student has been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: The Student has been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("The Student has been registered in another section of the same course.", HttpStatus.CONFLICT);
+				return new ResponseEntity<String>("Error: The Student has been registered in another section of the same course.", HttpStatus.CONFLICT);
 			
 			studentService.registerSection(student, section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("Registration for student is successful.", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Illegal Operation", HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<String>("Error: Illegal Operation", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/drop-course", method = RequestMethod.POST)
@@ -118,9 +118,9 @@ public class StudentController {
 			Student student = (Student) user;
 			CourseSection section = courseService.getSectionById(sectionId);
 			studentService.dropSection(student, section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("The course is successfully dropped", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Forbidden request.", HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<String>("Error: Forbidden request.", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/drop-course/{studentId}", method = RequestMethod.POST)
@@ -131,9 +131,9 @@ public class StudentController {
 			Student student = studentService.getStudentById(studentId);
 			
 			studentService.dropSection(student, section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("The course is successfully dropped for student.", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Illegal Operation", HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<String>("Error: Illegal Operation", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/change-section", method = RequestMethod.POST)
@@ -143,17 +143,17 @@ public class StudentController {
 			CourseSection section = courseService.getSectionById(sectionId);
 			Student student = (Student) user;
 			if(studentService.ifSectionAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifSectionsConflict(student, section, true))
-				return new ResponseEntity<String>("Time is conflict with another course.", HttpStatus.CONFLICT);
+				return new ResponseEntity<String>("Error: Time is conflict with another course.", HttpStatus.CONFLICT);
 			if(courseService.isSectionFull(section))
-				return new ResponseEntity<String>("This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: This course section is full. Please choose another one.", HttpStatus.NOT_ACCEPTABLE);
 			if(!studentService.ifCourseAlreadyRegistered(student, section))
-				return new ResponseEntity<String>("You have not registered this course.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: You have not registered this course.", HttpStatus.NOT_ACCEPTABLE);
 			studentService.changeSection(student, section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("Course section is changed successfully.", HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Forbidden request.", HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<String>("Error: Forbidden request.", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/get-detailed-student", method = RequestMethod.POST)

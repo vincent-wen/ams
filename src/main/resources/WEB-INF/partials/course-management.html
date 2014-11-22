@@ -1,16 +1,15 @@
 <div ng-controller="CourseCtrl">
 	<!-- Search Bar -->
-	<div class="input-group">
+	<div class="input-group margin-bottom">
 		<input type="text" class="form-control" placeholder="Input course name or id" ng-model="courseNameorId">
 
 		<div class="input-group-btn">
-			<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">Search <span class="caret"></span></button>
+			<button type="button" class="btn btn-success dropdown-toggle no-radius" data-toggle="dropdown">Search <span class="caret"></span></button>
 			<ul class="dropdown-menu dropdown-menu-right" role="menu">
 				<li><a href="" ng-click="searchById()">Search Course by Id</a></li>
 				<li><a href="" ng-click="searchByName()">Search Course by Name</a></li>
-				<li class="divider"></li>
-				<li><a href="" ng-click="searchAll()">Search All</a></li>
 			</ul>
+			<button type="button" class="btn btn-info" ng-click="searchAll()">List All</button>
 		</div>
 	</div>
 
@@ -27,8 +26,8 @@
 
 	<!-- Search Results -->
 	<div class="panel-group" id="search-result">
-		<div class="alert alert-danger" role="alert" ng-show="courses.length == 0">No course is found. Please try again.</div>
-		<div class="alert alert-danger" role="alert" ng-hide="registerError == '' || user().role != 'Student'">{{registerError}}</div>
+		<div class="alert alert-danger" role="alert" ng-hide="searchError == ''">{{searchError}}</div>
+		<div class="alert alert-danger" role="alert" ng-hide="registerError == '' || user().role != 'Student'">{{registerError | formatError}}</div>
 		<div class="alert alert-success" role="alert" ng-hide="registerSuccess == '' || user().role != 'Student'">{{registerSuccess}}</div>
 		<div class="panel panel-success" ng-repeat="(key, course) in courses">
 			<div class="panel-heading">
@@ -142,7 +141,7 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<h4>Choose A Student To Register</h4>
-					<div class="alert alert-danger" role="alert" ng-hide="registerError == ''">{{registerError}}</div>
+					<div class="alert alert-danger" role="alert" ng-hide="registerError == ''">{{registerError | formatError}}</div>
 					<div class="alert alert-success" role="alert" ng-hide="registerSuccess == ''">{{registerSuccess}}</div>
 
 					<div class="input-group margin-bottom" >

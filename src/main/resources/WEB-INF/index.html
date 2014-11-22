@@ -26,17 +26,17 @@
   <script src="js/services.js"></script>
   <script src="js/main.js"></script>
 </head>
-<body ng-controller="AppCtrl">
+<body ng-controller="AppCtrl" ng-cloak>
 <!--[if lt IE 7]>
   <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
   <![endif]-->
 
-  <navigation-bar></navigation-bar>
+  <navigation-bar ng-cloak></navigation-bar>
   <div id="content-zone" class="col-sm-10 col-sm-offset-1">
-    <left-panel></left-panel> 
+    <left-panel ng-cloak></left-panel> 
     <div class="panel panel-default col-sm-9" id="main-content">
       <div class="panel-body">
-        <div ng-view></div>
+        <div ng-view ng-cloak></div>
       </div>
     </div>
   </div>
