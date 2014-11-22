@@ -25,6 +25,13 @@ config(['$routeProvider', '$locationProvider', function($routeProvider, $locatio
   when('/payment', {
     templateUrl: '/api/partials/tuition-payment'
   }).
+  when('/inquiry', {
+    templateUrl: '/api/partials/information-inquiry'
+  }).
+  when('/payment/paypal/:payment_result', {
+    templateUrl: '/api/partials/tuition-payment',
+    controller: 'paymentCtrl'
+  }).
   otherwise({
     redirectTo: '/course'
   });

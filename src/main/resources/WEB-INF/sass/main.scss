@@ -93,9 +93,23 @@ table.table {
 }
 
 #dollor-sign {
-	left: 25%;
-	position: absolute;
-	top: 16%;
+	left: -58%;
+	position: relative;
+	top: 7px;
+}
+
+#left-panel {
+	opacity: 0.9;
+	li a {
+		color: $yellow-light;
+		font-weight: bold;
+		&:hover {
+			background: $black;
+		}
+	}
+	li.active a:hover {
+		background: #428bca;
+	}
 }
 
 // AngularJS Animation

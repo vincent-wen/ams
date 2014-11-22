@@ -1,14 +1,7 @@
 package ca.ams.services;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,13 +9,13 @@ import org.springframework.stereotype.Component;
 import ca.ams.configs.GenerateAccessToken;
 import ca.ams.models.CreditCardWrapper;
 
-import com.paypal.api.payments.Address;
 import com.paypal.api.payments.Amount;
 import com.paypal.api.payments.CreditCard;
-import com.paypal.api.payments.Details;
 import com.paypal.api.payments.FundingInstrument;
 import com.paypal.api.payments.Payer;
 import com.paypal.api.payments.Payment;
+import com.paypal.api.payments.PaymentExecution;
+import com.paypal.api.payments.RedirectUrls;
 import com.paypal.api.payments.Transaction;
 import com.paypal.core.rest.APIContext;
 import com.paypal.core.rest.PayPalRESTException;
@@ -44,6 +37,7 @@ public class PaymentService {
 	public boolean isAmountFormatValid(String amount) {
 		return amount.matches(amountRegex);
 	}
+	
 	public Payment payByCreditCard(CreditCardWrapper creditCardWrapper) {
 		// Verification
 		if(!creditCardWrapper.getNumber().matches(cardNumberRegex) ||
@@ -137,6 +131,57 @@ public class PaymentService {
 			// using a valid AccessToken
 			// The return object contains the status;
 			return payment.create(apiContext);
+		} catch (PayPalRESTException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public Payment payByPayPalAccount(String amountReq) {		
+		Amount amount = new Amount();
+		amount.setCurrency("CAD");
+		amount.setTotal(amountReq);
+
+		Transaction transaction = new Transaction();
+		transaction.setAmount(amount);
+		transaction.setDescription("Concordia tuition payment transaction via PayPal account.");
+
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		transactions.add(transaction);
+
+		Payer payer = new Payer();
+		payer.setPaymentMethod("paypal");
+
+		Payment payment = new Payment();
+		payment.setIntent("sale");
+		payment.setPayer(payer);
+		payment.setTransactions(transactions);
+		RedirectUrls redirectUrls = new RedirectUrls();
+		redirectUrls.setCancelUrl("https://localhost:8081/api/payment/paypal/paypal-account?success=false");
+		redirectUrls.setReturnUrl("https://localhost:8081/api/payment/paypal/paypal-account?success=true");
+		payment.setRedirectUrls(redirectUrls);
+
+		try {
+			String accessToken = accessTokenGenerator.getAccessToken();
+			APIContext apiContext = new APIContext(accessToken);
+			return payment.create(apiContext);
+		} catch (PayPalRESTException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Payment executePayPalAccount(String paymentId, String payerID) {
+		
+		try {
+			String accessToken = accessTokenGenerator.getAccessToken();
+			APIContext apiContext = new APIContext(accessToken);
+			
+			Payment payment = new Payment();
+			payment.setId(paymentId);
+			PaymentExecution paymentExecute = new PaymentExecution();
+			paymentExecute.setPayerId(payerID);
+			return payment.execute(apiContext, paymentExecute);
 		} catch (PayPalRESTException e) {
 			e.printStackTrace();
 		}

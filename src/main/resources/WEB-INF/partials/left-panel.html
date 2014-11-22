@@ -1,6 +1,9 @@
-<ul class="nav nav-pills nav-stacked col-sm-3">
-  <li><a href="/course" data-toggle="pill">Course Management</a></li>
-  <li ng-hide="user().role == 'Student'"><a href="/student" data-toggle="pill">Student Management</a></li>
-  <li><a href="/profile" data-toggle="pill">Profile Display</a></li>
-  <li ng-show="user().role == 'Student'"><a href="/payment" data-toggle="pill">Tuition Payment</a></li>
-</ul>
+<div class="col-sm-3" id="left-panel">
+<ul class="nav nav-pills nav-stacked">
+		<li><a href="/course" data-toggle="pill">Course Management</a></li>
+		<li ng-hide="user().role == 'Student'"><a href="/student" data-toggle="pill">Student Management</a></li>
+		<li><a href="/profile" data-toggle="pill">Profile Display</a></li>
+		<li ng-show="user().role == 'Student'"><a href="/payment" data-toggle="pill">Tuition Payment</a></li>
+		<li ng-show="user().role == 'Student' || user().role == 'Professor'"><a href="/inquiry" data-toggle="pill">Informatioin Inquiry</a></li>
+	</ul>
+</div>

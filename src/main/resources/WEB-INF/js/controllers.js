@@ -463,4 +463,17 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 				}).modal('show');
 			})
 		}
-	}]);
+	}]).
+
+controller('paymentCtrl', ['$scope', '$routeParams', '$location', 'paymentResult',
+	function($scope, $routeParams, $location, paymentResult){
+		$scope.result = paymentResult;
+		switch($routeParams.payment_result) {
+			case 'user_invalid': $scope.result.set('user_invalid', 'Current user is not student. But Payment is successful. Please contact to Registrar.'); break;
+			case 'payment_failure': $scope.result.set('payment_failure', 'Payment failed. Please try again.'); break;
+			case 'payment_success': $scope.result.set('payment_success', 'Payment is successful!'); break;
+			case 'payment_cancel': $scope.result.set('payment_cancel', 'Payment is cancelled by user.'); break;
+			default: break;
+		}
+		$location.url('/payment');
+}]);

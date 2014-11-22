@@ -9,6 +9,7 @@
 angular.module('app.services', []).
 
 service('userService', ['$http', '$rootScope', function($http, $rootScope) {
+	
 	var user = null;
 	var professors = {};
 	var update = function() {
@@ -112,14 +113,19 @@ service('timeslotService', ['$http', function($http){
 		},
 		updateTimeslots: update
 	}
-}]);
+}]).
 
-// service('userService',['$http', '$q', function($http, $q) {
-// 	var deferred = $q.defer();
+service('paymentResult', function() {
+	var result = {};
+	return {
+		get: function(name) {return result[name];},
+		set: function(name, value) {
+			result[name] = value;
+			setTimeout(function() {
+				result[name] = '';
+				console.log(result[name]);
+			}, 5000);
+		}
+	}
+});
 
-// 	$http.post('/api/get-current-user').success(function(user, status) {
-// 		deferred.resolve(user);
-// 	});
-
-// 	return deferred.promise;
-// }]);

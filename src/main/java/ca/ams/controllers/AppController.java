@@ -25,7 +25,11 @@ public class AppController {
 	}
 	
 	@RequestMapping(value = "/{pageName}", method = RequestMethod.GET)
-	public ModelAndView others(@PathVariable String pageName) {
+	public ModelAndView others1(@PathVariable String pageName) {
+		return new ModelAndView("index");
+	}
+	@RequestMapping(value = "/payment/paypal/{pageName}", method = RequestMethod.GET)
+	public ModelAndView others2(@PathVariable String pageName) {
 		return new ModelAndView("index");
 	}
 	

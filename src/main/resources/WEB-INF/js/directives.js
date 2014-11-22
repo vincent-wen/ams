@@ -122,13 +122,14 @@ directive('studentDetails', ['gradingSystem', function(gradingSystem) {
 	}
 }]).
 
-directive('payment', ['$http', 'userService', function($http, userService) {
+directive('payment', ['$http', '$window', 'userService', function($http, $window, userService) {
 	return {
 		restrict: 'E',
 		scope: true,
 		link: function(scope, elem, attr) {
 			scope.user = userService.getUser;
 			var form = scope.credit_card_form;
+			var accountForm = scope.paypal_account_form;
 			
 			//set dirty to form field level
 			var setDirty = function(field) {
@@ -150,7 +151,7 @@ directive('payment', ['$http', 'userService', function($http, userService) {
 				setDirty(form.cvv2);
 
 				if(form.$valid && scope.cardType != '') {
-					$http.post('/api/payment/pay-by-credit-card', {
+					$http.post('/api/payment/paypal/direct-credit-card', {
 						amount: form.amount.$viewValue,
 						type: scope.cardType,
 						firstName: form.firstname.$viewValue,
@@ -173,9 +174,30 @@ directive('payment', ['$http', 'userService', function($http, userService) {
 						scope.expireYear = '';
 						form.$setPristine();
 					}).error(function(data, status) {
-						scope.errorMessage = data.startsWith('Error:') ? data : '';
+						var err = 'Error:';
+						scope.errorMessage = data.slice(0, err.length) == err ? data : '';
 					});	
 				}	
+			}
+
+			scope.payByPayPalAccount = function() {
+				setDirty(form.amount);
+				if(accountForm.$valid) {
+					$http.post('/api/payment/paypal/paypal-account', form.amount.$viewValue
+					).success(function(data, status) {
+						scope.payment = data;
+						scope.errorMessage = '';
+						for(var i=0; i<data.links.length; i++) {
+							if(data.links[i].rel == 'approval_url') {
+								$window.open(data.links[i].href);
+							}
+						}
+						
+					}).error(function(data, status) {
+						var err = 'Error:';
+						scope.errorMessage = data.slice(0, err.length) == err ? data : '';
+					});	
+				}
 			}
 		}
 	}
