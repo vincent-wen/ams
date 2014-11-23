@@ -32,7 +32,7 @@ public class PaymentService {
 	private static final String cvv2Regex = "^[0-9]{3}$";
 	private static final String nameRegex = "^[a-zA-Z]+$";
 	private static final String typeRegex = "visa|mastercard|discover|amex";
-	private static final String amountRegex = "^[0-9]+\\.?[0-9]{0,2}$";
+	private static final String amountRegex = "^[0-9]+(\\.[0-9]{2})?$";
 		
 	public boolean isAmountFormatValid(String amount) {
 		return amount.matches(amountRegex);

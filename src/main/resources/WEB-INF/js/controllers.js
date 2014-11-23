@@ -4,8 +4,8 @@
 
 angular.module('app.controllers', []).
 
-controller('AppCtrl', ['$scope', 'userService', '$window', 
-	function($scope, userService, $window) {
+controller('AppCtrl', ['$scope', 'userService', '$window', '$rootScope',
+	function($scope, userService, $window, $rootScope) {
 		$scope.user = userService.getUser;
 
 		$scope.logout = function() {
@@ -14,8 +14,15 @@ controller('AppCtrl', ['$scope', 'userService', '$window',
 
 		$scope.showContent = function() {
 			angular.element('#main-content').css("opacity", 1);
-			angular.element('#topnav').css("opacity", 1);
 		}
+
+		$rootScope.$on('loading-begin', function() {
+			angular.element('#loading').css('display', 'block');
+		});
+
+		$rootScope.$on('loading-complete', function() {
+			angular.element('#loading').css('display', 'none');
+		});
 	}]).
 
 controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', 'gradingSystem', 'formatErrorFilter',

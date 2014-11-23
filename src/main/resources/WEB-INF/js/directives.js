@@ -122,8 +122,8 @@ directive('studentDetails', ['gradingSystem', function(gradingSystem) {
 	}
 }]).
 
-directive('payment', ['$http', '$window', 'userService',
-	function($http, $window, userService, formatErrorFilter) {
+directive('payment', ['$http', '$window', 'userService', '$rootScope',
+	function($http, $window, userService, $rootScope) {
 		return {
 			restrict: 'E',
 			scope: true,
@@ -143,6 +143,7 @@ directive('payment', ['$http', '$window', 'userService',
 			scope.cardType = '';
 
 			scope.payByCreditCard = function() {
+				console.log('aaa');
 				setDirty(form.amount);
 				setDirty(form.firstname);
 				setDirty(form.lastname);
@@ -152,6 +153,8 @@ directive('payment', ['$http', '$window', 'userService',
 				setDirty(form.cvv2);
 
 				if(form.$valid && scope.cardType != '') {
+					$rootScope.$emit('loading-begin');
+
 					$http.post('/api/payment/paypal/direct-credit-card', {
 						amount: form.amount.$viewValue,
 						type: scope.cardType,
@@ -162,6 +165,7 @@ directive('payment', ['$http', '$window', 'userService',
 						expireYear: form.expireYear.$viewValue,
 						cvv2: form.cvv2.$viewValue
 					}).success(function(data, status) {
+						$rootScope.$emit('loading-complete');
 						userService.updateUser();
 						scope.isPaymentComplete = true;
 						scope.payment = data;
@@ -175,6 +179,7 @@ directive('payment', ['$http', '$window', 'userService',
 						scope.expireYear = '';
 						form.$setPristine();
 					}).error(function(data, status) {
+						$rootScope.$emit('loading-complete');
 						scope.errorMessage = data;
 					});	
 				}	
@@ -183,8 +188,10 @@ directive('payment', ['$http', '$window', 'userService',
 			scope.payByPayPalAccount = function() {
 				setDirty(form.amount);
 				if(accountForm.$valid) {
+					$rootScope.$emit('loading-begin');
 					$http.post('/api/payment/paypal/paypal-account', form.amount.$viewValue
 						).success(function(data, status) {
+							$rootScope.$emit('loading-complete');
 							scope.payment = data;
 							scope.errorMessage = '';
 							for(var i=0; i<data.links.length; i++) {
@@ -194,6 +201,7 @@ directive('payment', ['$http', '$window', 'userService',
 							}
 
 						}).error(function(data, status) {
+							$rootScope.$emit('loading-complete');
 							scope.errorMessage = data;
 						});	
 					}
