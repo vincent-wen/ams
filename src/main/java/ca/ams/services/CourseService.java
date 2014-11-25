@@ -18,7 +18,7 @@ public class CourseService {
 	@Autowired
 	private ProfessorService professorService;
 	
-	private final static String courseIdAndNameRegex = "[\\w]+";
+	private final static String courseIdAndNameRegex = "[\\w\\s]+";
 	private final static String locationRegex = "[A-Za-z]{2}[-_]{1}[\\d]{3}";
 
 	public List<Course> getCoursesById(String courseId) {

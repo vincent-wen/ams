@@ -34,7 +34,6 @@ public class UserService {
 	 * Iterations: 100000.
 	 */
 	private static final StrongPasswordEncoder encryptor = new StrongPasswordEncoder();
-	private List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
 	private static final String passwordPattern = "^.*(?=.{6,20})(?=.*\\d)(?=.*[a-zA-Z]).*$";
 	// Start with a character, end with a character
 	private static final String emailPattern = "^[a-zA-Z]+[\\d\\w\\.\\-\\_]*@[\\w\\.\\-\\_]+\\.[a-zA-Z]+$";
@@ -49,6 +48,7 @@ public class UserService {
 	
 	public void loginProceed(User user) {
 		try {
+			List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
 			AUTHORITIES.add(new SimpleGrantedAuthority(user.getRole().toString()));
 			Authentication auth = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), AUTHORITIES);
 			SecurityContextHolder.getContext().setAuthentication(auth);
@@ -120,7 +120,6 @@ public class UserService {
 
 	public void logout() {
 		SecurityContextHolder.getContext().setAuthentication(null);
-		AUTHORITIES.clear();
 	}
 
 	public void updatePassword(User currentUser, String newpassword) {
