@@ -34,6 +34,7 @@ public class AdminService {
 		Professor professor3 = createProfessor3();
 		Student student1 = createStudent1();
 		createStudent2();
+		createStudent3();
 		createGPD1();
 		createRegistrar1();
 		
@@ -172,6 +173,20 @@ public class AdminService {
 		student.setName("Iris Li");
 		student.setRole(Role.ROLE_STUDENT);
 		student.setPhoneNumber("514-430-3245");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent3() {
+		Student student = new Student();
+		student.setUsername("ahmad");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("iahmad.ictp@gmail.com");
+		student.setStudentId("6283124");
+		student.setProgram("Software Engineering");
+		student.setName("Ahmad Al-Sheikh Hassan");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0000");
 		return studentRepos.save(student);
 	}
 	
