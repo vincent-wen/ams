@@ -17,13 +17,13 @@ public class AppController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home() {
-		if(userService.getCurrentUser() == null) return "redirect:/login";
+		if(!userService.hasLogin()) return "redirect:/login";
 		return "index";
 	}
 	
 	@RequestMapping(value = "/api/partials/{pageName}", method = RequestMethod.GET)
 	public String partialPages(@PathVariable String pageName) {
-		if(userService.getCurrentUser() == null) return "redirect:/login";
+		if(!userService.hasLogin()) return null;
 		return "partials/" + pageName;
 	}
 	

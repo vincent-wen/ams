@@ -13,11 +13,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		 http
-            .formLogin()
-             	.loginPage("/login")
-             	.loginProcessingUrl("login")
-             	.permitAll()
-             	.and()
             .authorizeRequests()
          		.antMatchers(HttpMethod.GET, "/js/login.js").permitAll()
          		.antMatchers(HttpMethod.GET, "/css/**").permitAll() 
@@ -26,6 +21,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers(HttpMethod.GET, "/init").permitAll()
          		.anyRequest().authenticated()
          		.and()
+         	.formLogin()
+             	.loginPage("/login")
+             	.loginProcessingUrl("login") //Here if using /login, the request is not permitted.
+             	.permitAll()
+             	.and()
             .logout()                                    
              	.permitAll();
     }

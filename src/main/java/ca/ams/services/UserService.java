@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -32,8 +33,8 @@ public class UserService {
 	 * Salt size: 16 bytes.
 	 * Iterations: 100000.
 	 */
-	private StrongPasswordEncoder encryptor = new StrongPasswordEncoder();
-	private static final List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
+	private static final StrongPasswordEncoder encryptor = new StrongPasswordEncoder();
+	private List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
 	private static final String passwordPattern = "^.*(?=.{6,20})(?=.*\\d)(?=.*[a-zA-Z]).*$";
 	// Start with a character, end with a character
 	private static final String emailPattern = "^[a-zA-Z]+[\\d\\w\\.\\-\\_]*@[\\w\\.\\-\\_]+\\.[a-zA-Z]+$";
@@ -41,7 +42,10 @@ public class UserService {
 	// "5144308745" or "514-430-8745" or "514 430 8745" or "514.430.8745", can be followed by " ext12345" or " ext123"
 	private static final String phoneNumberPattern = "\\(?\\d{3}\\)?[-\\.\\s]?\\d{3}[-\\.\\s]?\\d{4}(\\s(ext)\\d{3,5})?";
 			
-			
+	public boolean hasLogin() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return auth != null && !(auth instanceof AnonymousAuthenticationToken);
+	}
 	
 	public void loginProceed(User user) {
 		try {
@@ -73,9 +77,12 @@ public class UserService {
 	
 	public User getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if(auth == null) return null;
-		Role userRole = Role.valueOf(getUserRole());
+		if(auth == null || auth instanceof AnonymousAuthenticationToken) return null;
+		Role userRole = null;
 		User currentUser = null;
+		for(GrantedAuthority authority : auth.getAuthorities()) {
+			userRole = Role.valueOf(authority.getAuthority());
+		}
 		switch(userRole) {
 			case ROLE_STUDENT : currentUser = studentRepos.findByUsername(auth.getName()); break;
 			case ROLE_PROFESSOR : currentUser = professorRepos.findByUsername(auth.getName()); break;

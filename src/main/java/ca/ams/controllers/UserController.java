@@ -30,7 +30,7 @@ public class UserController {
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String loginPage() {
-		if(userService.getCurrentUser() != null) return "redirect:/";
+		if(userService.hasLogin()) return "redirect:/";
 		return "login";
 	}
 	
