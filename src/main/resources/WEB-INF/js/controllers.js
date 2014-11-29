@@ -34,7 +34,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			Thursday: true,
 			Friday: true,
 		}
-		$scope.timeslots = timeslotService.getTimeslots;
+		$scope.timeslots = [];
 		$scope.timeslotPreference = {};
 		$scope.weekdayKeys = Object.keys($scope.weekdayPreference);
 
@@ -106,16 +106,27 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			}
 		})
 
+		$scope.registerSectionRequest = function(section, courseId) {
+			$scope.chosen.section = section;
+			$scope.chosen.courseId = courseId;
+			angular.element('#confirm-register-course').modal({
+				backdrop: 'static'
+			}).modal('show');
+		}
+
 		$scope.registerSection = function(sectionId) {
 			$http.post('/api/student/register-course', sectionId)
 			.success(function(data, status) {
 				$scope.registerError = '';
 				$scope.registerSuccess = data;
 				userService.updateUser();
+				$scope.chosen.section.size ++;
+				angular.element('#confirm-register-course').modal('hide');
 			})
 			.error(function(data, status) {
 				$scope.registerError = data;
 				$scope.registerSuccess = '';
+				angular.element('#confirm-register-course').modal('hide');
 			})
 		}
 
@@ -329,6 +340,17 @@ controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 
 		$scope.editPhoneNumberMode = false;
 		$scope.editEmailMode = false;
+		$scope.showChangeButton = false;
+
+		$scope.changeSectionError = '';
+		$scope.phoneNumberError = '';
+		$scope.emailError = '';
+
+		$scope.$watch('user()', function(user) {
+			if(user == null) return;
+			$scope.phoneNumber = user.phoneNumber;
+			$scope.email = user.email;
+		})
 
 		$scope.switchEditMode = function(mode) {
 			$scope[mode] = !$scope[mode];
@@ -338,8 +360,9 @@ controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 			$http.post('/api/user/change-phone-number', $scope.phoneNumber)
 			.success(function(data, status) {
 				$scope.phoneNumberError = '';
-				userService.updateUser();
+				$scope.user().phoneNumber = $scope.phoneNumber;
 				$scope.editPhoneNumberMode = false;
+				$scope.phoneNumberError = '';
 			})
 			.error(function(data, status) {
 				$scope.phoneNumberError = data;
@@ -350,7 +373,7 @@ controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 			$http.post('/api/user/change-email', $scope.email)
 			.success(function(data, status) {
 				$scope.emailError = '';
-				userService.updateUser();
+				$scope.user().email = $scope.email;
 				$scope.editEmailMode = false;
 			})
 			.error(function(data, status) {
@@ -383,9 +406,12 @@ controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 			$http.post('/api/student/change-section', $scope.chosenSection.id)
 			.success(function(data, status) {
 				angular.element('#display-sections').modal('hide');
+				$scope.showChangeButton = false;
 				userService.updateUser();
+				$scope.changeSectionError = '';
 			})
 			.error(function(data, status) {
+				$scope.showChangeButton = false;
 				$scope.changeSectionError = data;
 			})
 		}
@@ -473,6 +499,6 @@ controller('inquiryCtrl', ['$scope', 'inquiryService', function($scope, inquiryS
 		$scope.chosenInquiry = inquiry;
 		angular.element('#inquiry-details').modal({
 			backdrop: 'static'
-		}).show();
+		}).modal('show');
 	}
 }]);

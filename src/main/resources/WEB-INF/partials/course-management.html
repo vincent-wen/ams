@@ -105,7 +105,7 @@
 							<div class="text-danger" ng-show="capacityMode[key][id]"></div>
 						</div>
 					</div>
-					<a href="" class="section-footer pull-right" ng-click="registerSection(section.id)" ng-show="user().role == 'Student'"><span class="label label-info">Register</span></a>
+					<a href="" class="section-footer pull-right" ng-click="registerSectionRequest(section, course.courseId)" ng-show="user().role == 'Student'"><span class="label label-info">Register</span></a>
 					<a href="" class="section-footer pull-right" ng-click="showEnrolledStudents(section.id)" ng-hide="user().role == 'Student'"><span class="label label-warning">Show enrolled students</span></a>
 					<a href="" class="section-footer pull-right" ng-click="registerSectionForStudent(section.id)" ng-show="user().role == 'Graduate Program Director' || user().role == 'Registrar'"><span class="label label-info">Register for Student</span></a>
 					
@@ -131,6 +131,25 @@
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" role="dialog" id="confirm-register-course" aria-labelledby="confirmRegisterCourseLabel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4 class="text-info">Are you sure to register the course {{chosen.courseId}} with the following section?</h4>
+					<li class="list-group-item list-group-item-warning">
+						<p>Time: {{chosen.section.timeslot.startTime}} - {{chosen.section.timeslot.endTime}} on {{chosen.section.weekday}}</p>
+						<p>Instructor: Dr. {{chosen.section.instructor.name}}</p>
+						<p>Location: {{chosen.section.location}}</p>
+					</li>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-success" ng-click="registerSection(chosen.section.id)">Yes, go ahead.</button>
+					<button class="btn btn-default" data-dismiss="modal">No, thanks.</button>
 				</div>
 			</div>
 		</div>

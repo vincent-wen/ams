@@ -78,8 +78,17 @@ public class StudentController {
 				return new ResponseEntity<String>("Error: You have already registered this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyCompleted(student, section))
 				return new ResponseEntity<String>("Error: This course has already been completed.", HttpStatus.NOT_ACCEPTABLE);
-			if(!studentService.ifPrerequsitesFulfilled(student, section))
-				return new ResponseEntity<String>("Error: You haven't fulfilled the prerequisites of the course.", HttpStatus.NOT_ACCEPTABLE);
+			
+			String coursesId = "";
+			for(String courseId : studentService.getPrerequisitesNotFulfilled(student, section)) {
+				coursesId = coursesId.concat(", " + courseId);
+			}
+			if(!coursesId.isEmpty()) {
+				// remove the first ", " at the head of the string.
+				coursesId = coursesId.substring(2);
+				return new ResponseEntity<String>("Error: You haven't fulfilled the prerequisites " + coursesId + " of the course.", HttpStatus.NOT_ACCEPTABLE);
+			}
+				
 			if(studentService.ifCourseAlreadyRegistered(student, section))
 				return new ResponseEntity<String>("Error: You can not register for the same course twice within the same semester.", HttpStatus.CONFLICT);
 			if(studentService.ifSectionsConflict(student, section, false))

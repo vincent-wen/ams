@@ -10,13 +10,13 @@
 			<span ng-hide="editPhoneNumberMode">{{user().phoneNumber}}</span>
 			<span class="list-edit" ng-show="editPhoneNumberMode">
 				<span class="input-group input-group-sm">
-					<input type="text" class="form-control" name="phoneNumber" ng-model="phoneNumber" ng-init="phoneNumber = user().phoneNumber">
+					<input type="text" class="form-control" name="phoneNumber" ng-model="phoneNumber">
 					<span class="input-group-btn">
 						<button class="btn btn-info" type="button" ng-click="changePhoneNumber()">save</button>
 						<button class="btn btn-default" type="button" ng-click="switchEditMode('editPhoneNumberMode')"><span class="glyphicon glyphicon-remove"></span></button>
 					</span>
 				</span>
-				<span class="text-danger">{{phoneNumberError | formatError}}</span>
+				<span class="text-danger" ng-hide="phoneNumberError == ''">{{phoneNumberError | formatError}}</span>
 			</span>
 			<a href="" ng-click="switchEditMode('editPhoneNumberMode')" ng-hide="editPhoneNumberMode"><span class="glyphicon glyphicon-pencil"></span></a>
 		</li>
@@ -25,13 +25,13 @@
 			<span ng-hide="editEmailMode">{{user().email}}</span>
 			<span class="list-edit" ng-show="editEmailMode">
 				<span class="input-group input-group-sm">
-					<input type="text" class="form-control" name="email" ng-model="email" ng-init="email = user().email">
+					<input type="text" class="form-control" name="email" ng-model="email">
 					<span class="input-group-btn">
 						<button class="btn btn-info" type="button" ng-click="changeEmail()">save</button>
 						<button class="btn btn-default" type="button" ng-click="switchEditMode('editEmailMode')"><span class="glyphicon glyphicon-remove"></span></button>
 					</span>
 				</span>
-				<span class="text-danger">{{emailError | formatError}}</span>
+				<span class="text-danger" ng-hide="emailError == ''">{{emailError | formatError}}</span>
 			</span>
 			<a href="" ng-click="switchEditMode('editEmailMode')" ng-hide="editEmailMode"><span class="glyphicon glyphicon-pencil"></span></a>
 		</li>
@@ -85,7 +85,7 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<h4>Select a new course Section</h4>
-					<div class="text-danger">{{changeSectionError | formatError}}</div>
+					<div class="text-danger" ng-hide="changeSectionError == ''">{{changeSectionError | formatError}}</div>
 					<div class="list-group">
 						<a href="" class="list-group-item" ng-click="chooseSection($event, section)" ng-repeat="section in sections" ng-class="{disabled:registerSectionId == section.id}">
 							<p>Time: {{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</p>
@@ -95,8 +95,9 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button class="btn btn-success" ng-click="changeSection()">Confirm</button>
-					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button class="btn btn-success" ng-hide="showChangeButton" ng-click="showChangeButton = true">Select</button>
+					<button class="btn btn-warning" ng-show="showChangeButton" ng-click="changeSection()">Confirm to Change Section</button>
+					<button class="btn btn-default" data-dismiss="modal" ng-click="showChangeButton = false">Cancel</button>
 				</div>
 			</div>
 		</div>

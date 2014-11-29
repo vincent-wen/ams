@@ -34,7 +34,7 @@ public class AdminService {
 		Professor professor3 = createProfessor3();
 		Student student1 = createStudent1();
 		createStudent2();
-		createStudent3();
+		Student student3 = createStudent3();
 		createGPD1();
 		createRegistrar1();
 		
@@ -67,14 +67,15 @@ public class AdminService {
 		professor2.getInstructedSections().add(section2);
 		section2.setTimeslot(timeslot2);
 		section2.setWeekday(Weekday.Tuesday);
+		section2.setCapacity(1);
 		section2 = sectionRepos.save(section2);
 		
 		CourseSection section3 = new CourseSection();
 		section3.setLocation("EV-303");
 		section3.setInstructorId(professor3.getId());
 		professor3.getInstructedSections().add(section3);
-		section3.setTimeslot(timeslot1);
-		section3.setWeekday(Weekday.Thursday);
+		section3.setTimeslot(timeslot2);
+		section3.setWeekday(Weekday.Tuesday);
 		section3 = sectionRepos.save(section3);
 		
 		CourseSection section4 = new CourseSection();
@@ -84,6 +85,14 @@ public class AdminService {
 		section4.setTimeslot(timeslot3);
 		section4.setWeekday(Weekday.Friday);
 		section4 = sectionRepos.save(section4);
+		
+		CourseSection section5 = new CourseSection();
+		section5.setLocation("EV-304");
+		section5.setInstructorId(professor2.getId());
+		professor2.getInstructedSections().add(section5);
+		section5.setTimeslot(timeslot2);
+		section5.setWeekday(Weekday.Tuesday);
+		section5 = sectionRepos.save(section5);
 
 		Course course1 = new Course();
 		course1.setCourseDescription("Quality assurance, quality factors, components of a software quality assurance system, contract review, software development and quality plans, activities and alternatives, integration of quality activities  in a project lifecycle, reviews, software inspection, software verification,  testing processes, static analysis, control-flow analysis, data-flow analysis, control-flow testing, loop testing, data-flow testing, transaction-flow testing, domain testing, type-based analysis, dynamic analysis, usage models, operational profiles, result and defect analysis, reliability, performance analysis, maintenance and reverse engineering, case tools and software quality assurance. A project.");
@@ -100,7 +109,6 @@ public class AdminService {
 		course2.setCourseName("Software Design Methodology");
 		course2.getCourseSections().add(section3);
 		course2.setCredits(4.0);
-		course2.getPrerequisiteCourseIds().add(course1.getId());
 		course2 = courseRepos.save(course2);
 		
 		Course course3 = new Course();
@@ -115,25 +123,32 @@ public class AdminService {
 		course4.setCourseDescription("Role of measurement in Software Engineering, theoretical, technical and managerial views on software measurement. Representational theory of measurement. Theoretical validation of software measurement. Measurement program: goal-driven approach. Collecting and analyzing software engineering data. Software quality modeling and measuring. Testing and measurement. Reliability models. Functional size measurement methods. Effort estimation models and their usage in project management. Software measurement standards. Tool support. A project.");
 		course4.setCourseId("SOEN6611");
 		course4.setCourseName("Software Measurement");
-//		course4.getCourseSections().add(section3);
+		course4.getCourseSections().add(section5);
 		course4.setCredits(4.0);
+		course4.getPrerequisiteCourseIds().add(course1.getId());
+		course4.getPrerequisiteCourseIds().add(course2.getId());
+		course4.getPrerequisiteCourseIds().add(course3.getId());
 		course4 = courseRepos.save(course4);
 		
 		section1.setCourseObjectId(course1.getId());
 		section2.setCourseObjectId(course1.getId());
 		section3.setCourseObjectId(course2.getId());
 		section4.setCourseObjectId(course3.getId());
+		section5.setCourseObjectId(course4.getId());
 		sectionRepos.save(section1);
 		sectionRepos.save(section2);
 		sectionRepos.save(section3);
 		sectionRepos.save(section4);
+		sectionRepos.save(section5);
 		professorRepos.save(professor1);
 		professorRepos.save(professor2);
 		professorRepos.save(professor3);
 		
 		student1.getCompletedCoursesAndGrades().put(course3.getId(), Grade.A.toString());
-		student1.getCompletedCoursesAndGrades().put(course4.getId(), Grade.Bplus.toString());
+		student3.getCompletedCoursesAndGrades().put(course3.getId(), Grade.A.toString());
+		student3.getCompletedCoursesAndGrades().put(course4.getId(), Grade.Aplus.toString());
 		studentRepos.save(student1);
+		studentRepos.save(student3);
 	}
 
 	private Registrar createRegistrar1() {

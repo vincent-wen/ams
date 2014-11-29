@@ -1,5 +1,6 @@
 package ca.ams.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -60,10 +61,15 @@ public class StudentService {
 		return student.getCompletedCoursesAndGrades().containsKey(section.getCourseObjectId());
 	}
 
-	public boolean ifPrerequsitesFulfilled(Student student,	CourseSection section) {
+	public List<String> getPrerequisitesNotFulfilled(Student student, CourseSection section) {
 		Course course = courseService.getCourseById(section.getCourseObjectId());
 		Set<String> completedCourseIds = student.getCompletedCoursesAndGrades().keySet();
-		return completedCourseIds.containsAll(course.getPrerequisiteCourseIds());
+		List<String> prerequisitesNotFulfilled = new ArrayList<String>();
+		for(String courseObjectId : course.getPrerequisiteCourseIds()) {
+			if(completedCourseIds.contains(courseObjectId)) continue;
+			prerequisitesNotFulfilled.add(courseService.getCourseById(courseObjectId).getCourseId());
+		}
+		return prerequisitesNotFulfilled;
 	}
 
 	public void changeSection(Student student, CourseSection section) {

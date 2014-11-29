@@ -13,9 +13,9 @@ filter('isEmpty', function() {
 filter('formatError', function() {
 	var err = "Error: ";
 	return function(error) {
-		if(error != undefined && error.slice(0, err.length) == err) {
+		if(error != undefined && typeof error === 'string' && error.slice(0, err.length) == err) {
 			return error.slice(err.length);
 		}
-		return '';
+		return 'Your operation is not successful. Please try again or contact vincent.wen77@gmail.com.';
 	}
 });

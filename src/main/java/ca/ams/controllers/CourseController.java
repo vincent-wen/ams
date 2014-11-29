@@ -145,7 +145,7 @@ public class CourseController {
 			if(section == null)
 				return new ResponseEntity<String>("Error: Course section not found.", HttpStatus.NOT_FOUND);
 			if(!courseService.validateCapacity(courseSection.getCapacity()))
-				return new ResponseEntity<String>("Error: Capacity must be an integer between 10 to 300.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: Capacity must be an integer larger than 1.", HttpStatus.NOT_ACCEPTABLE);
 			if(courseService.ifEnrolledStudentsMoreThanCapacity(section, courseSection.getCapacity()))
 				return new ResponseEntity<String>("Error: Capacity must be bigger than the number of students who have been enrolled in this course section.", HttpStatus.NOT_ACCEPTABLE);
 

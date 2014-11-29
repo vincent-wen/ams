@@ -91,7 +91,7 @@ public class CourseService {
 	}
 
 	public boolean validateCapacity(int capacity) {
-		return capacity >= 10 && capacity <=300;
+		return capacity >= 1;
 	}
 
 	public boolean ifEnrolledStudentsMoreThanCapacity(CourseSection section, int capacity) {
