@@ -25,4 +25,4 @@ filter('formatTime', function() {
 		if(time == undefined || time == null) return time;
 		return time.hour+':'+time.minute;
 	};
-});;
+});
