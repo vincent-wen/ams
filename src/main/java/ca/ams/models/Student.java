@@ -35,8 +35,10 @@ public class Student extends User{
 	
 	public void updatePenalty() {
 		Calendar now = Calendar.getInstance();
-		if(now.get(Calendar.MONTH) == MonthCache.currentMonth) return;
+		int currentMonth = now.get(Calendar.MONTH);
+		if(currentMonth == MonthCache.currentMonth) return;
 		
+		MonthCache.currentMonth = currentMonth;
 		int delayMonths = now.get(Calendar.MONTH) - Calendar.SEPTEMBER;
 		if(delayMonths > 0 && !this.tuition.add(this.penalty).subtract(this.alreadyPaid).equals(0)) {
 			this.penalty = new BigDecimal(delayMonths * 75);
