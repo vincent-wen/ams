@@ -62,7 +62,7 @@
 				</span>
   		</div>
 		</div>
-		<div class="text-danger">{{errorMessage | formatError}}</div>
+		<div class="text-danger" ng-hide="errorMessage == ''">{{errorMessage | formatError}}</div>
 	  <button type="submit" class="btn btn-success pull-right">Sign In</button>
 	</form>
 	</div>

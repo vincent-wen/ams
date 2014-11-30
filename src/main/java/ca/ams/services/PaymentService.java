@@ -27,26 +27,37 @@ public class PaymentService {
 	private GenerateAccessToken accessTokenGenerator;
 	
 	private static final String cardNumberRegex = "^[0-9]{16}$";
-	private static final String expireMonthRegex = "^[0-9]{2}$";
+	private static final String expireMonthRegex =  	"^0[1-9]{1}$|^1[0-2]{1}$";
 	private static final String expireYearRegex = "^[0-9]{4}$";
 	private static final String cvv2Regex = "^[0-9]{3}$";
 	private static final String nameRegex = "^[a-zA-Z]+$";
 	private static final String typeRegex = "visa|mastercard|discover|amex";
-	private static final String amountRegex = "^[0-9]+(\\.[0-9]{2})?$";
+	// amountRegex accepts 1 or 2 decimals, bigger than 0.
+	private static final String amountRegex = "^[1-9]{1}[\\d]*(\\.[\\d]{1,2})?$|^0\\.[\\d]{1,2}$";
 		
-	public boolean isAmountFormatValid(String amount) {
+	public boolean validateAmount(String amount) {
 		return amount.matches(amountRegex);
+	}
+	public boolean validateCardType(String type) {
+		return type.matches(typeRegex);
+	}
+	public boolean validateCardNumber(String number) {
+		return number.matches(cardNumberRegex);
+	}
+	public boolean validateName(String name) {
+		return name.matches(nameRegex);
+	}
+	public boolean validateExpireMonth(String expireMonth) {
+		return expireMonth.matches(expireMonthRegex);
+	}
+	public boolean validateExpireYear(String expireYear) {
+		return expireYear.matches(expireYearRegex);
+	}
+	public boolean validateCVV2(String type) {
+		return type.matches(cvv2Regex);
 	}
 	
 	public Payment payByCreditCard(CreditCardWrapper creditCardWrapper) {
-		// Verification
-		if(!creditCardWrapper.getNumber().matches(cardNumberRegex) ||
-			!creditCardWrapper.getExpireMonth().matches(expireMonthRegex) ||
-			!creditCardWrapper.getExpireYear().matches(expireYearRegex) ||
-			!creditCardWrapper.getFirstName().matches(nameRegex) ||
-			!creditCardWrapper.getLastName().matches(nameRegex) ||
-			!creditCardWrapper.getCvv2().matches(cvv2Regex) ||
-			!creditCardWrapper.getType().matches(typeRegex)) return null;
 		
 		CreditCard creditCard = creditCardWrapper.convertToCreditCard();
 		

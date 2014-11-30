@@ -15,12 +15,12 @@
 
 	<!-- Search Filters -->
 	<div class="margin-bottom text-light" ng-hide="courses | isEmpty">
-		<span ng-repeat="weekday in weekdayKeys">
+		<span ng-repeat="weekday in weekdays">
 			<input type="checkbox" name="weekdaysFilter" ng-model="weekdayPreference[weekday]" > {{weekday}} 
 		</span><br>
-		<span ng-repeat="(timeslot, value) in timeslotPreference">
-			<input type="checkbox" name="timeslotsFilter" ng-model="timeslotPreference[timeslot]">
-			 {{timeslot}} 
+		<span ng-repeat="(schedule, value) in schedulePreference">
+			<input type="checkbox" name="schedulesFilter" ng-model="schedulePreference[schedule]">
+			 {{schedule}}
 		</span>
 	</div>
 
@@ -50,16 +50,17 @@
 				<div class="panel-body" ng-repeat="(id, section) in course.courseSections" ng-show="sectionFilter(section)">
 					<div>
 						<div ng-init="timeMode[key][id] = false">Time: 
-							<span ng-hide="timeMode[key][id]">{{section.timeslot.startTime}} - {{section.timeslot.endTime}} on {{section.weekday}}</span>
+							<span ng-hide="timeMode[key][id]">{{section.schedule.startTime | formatTime}} - {{section.schedule.endTime | formatTime}} on {{section.schedule.weekday}}</span>
 							<span class="section-edit" ng-show="timeMode[key][id]">
-								<input type="time" class="form-control input-sm" name="startTime" ng-value="section.timeslot.startTime"> -
-								<input type="time" class="form-control input-sm" name="endTime" ng-value="section.timeslot.endTime"> on 
+								<input type="time" class="form-control input-sm" name="startTime" ng-value="section.schedule.startTime | formatTime"> -
+								<input type="time" class="form-control input-sm" name="endTime" ng-value="section.schedule.endTime | formatTime"> on 
 								<select class="form-control input-sm">
-									<option ng-repeat="weekday in weekdays" ng-selected="weekday == section.weekday">{{weekday}}</option>
+									<option ng-repeat="weekday in weekdays" ng-selected="weekday == section.schedule.weekday">{{weekday}}</option>
 								</select>
 								<span class="btn-group">
-									<button class="btn btn-link" type="button" ng-click="changeTime($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
-									<button class="btn btn-link" type="button" ng-click="switchMode('timeMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+									<button class="btn btn-link hidden" type="button" id="confirm-button" ng-click="changeTime($event, key, id)">Click to confirm the change</button>
+									<button class="btn btn-link" type="button" ng-click="confirmRequest($event)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('timeMode', key, id, $event)"><span class="glyphicon glyphicon-remove text-warning"></span></button>
 								</span>
 							</span>
 							<a href="" ng-click="switchMode('timeMode', key, id)" ng-hide="timeMode[key][id] || user().role != 'Graduate Program Director'"><span class="glyphicon glyphicon-pencil"></span></a>
@@ -73,8 +74,9 @@
 									<li role="presentation" ng-repeat="professor in professors() | filter: instructor[key][id]: false" ng-click="chooseProfessor(professor.name, key, id)"><a role="menuitem" tabindex="-1" href="">{{professor.name}}</a></li>
 								</ul>
 								<span class="btn-group">
-									<button class="btn btn-link" type="button" ng-click="changeInstructor($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
-									<button class="btn btn-link" type="button" ng-click="switchMode('instructorMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+									<button class="btn btn-link hidden" type="button" id="confirm-button" ng-click="changeInstructor($event, key, id)">Click to confirm the change</button>
+									<button class="btn btn-link" type="button" ng-click="confirmRequest($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('instructorMode', key, id, $event)"><span class="glyphicon glyphicon-remove text-warning"></span></button>
 								</span>
 							</span>
 							<a href="" ng-click="switchMode('instructorMode', key, id)" ng-hide="instructorMode[key][id] || user().role != 'Graduate Program Director'"><span class="glyphicon glyphicon-pencil"></span></a>
@@ -85,8 +87,9 @@
 							<span class="section-edit" ng-show="locationMode[key][id]">
 								<input type="text" class="form-control input-sm" name="location" ng-value="section.location">
 								<span class="btn-group">
-									<button class="btn btn-link" type="button" ng-click="changeLocation($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
-									<button class="btn btn-link" type="button" ng-click="switchMode('locationMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+									<button class="btn btn-link hidden" type="button" id="confirm-button" ng-click="changeLocation($event, key, id)">Click to confirm the change</button>
+									<button class="btn btn-link" type="button" ng-click="confirmRequest($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('locationMode', key, id, $event)"><span class="glyphicon glyphicon-remove text-warning"></span></button>
 								</span>
 							</span>
 							<a href="" ng-click="switchMode('locationMode', key, id)" ng-hide="locationMode[key][id] || user().role != 'Graduate Program Director'"><span class="glyphicon glyphicon-pencil"></span></a>
@@ -97,8 +100,9 @@
 							<span class="section-edit" ng-show="capacityMode[key][id]">
 								<input type="number" class="form-control input-sm" name="capacity" step="1" ng-value="section.capacity">
 								<span class="btn-group">
-									<button class="btn btn-link" type="button" ng-click="changeCapacity($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
-									<button class="btn btn-link" type="button" ng-click="switchMode('capacityMode', key, id)"><span class="glyphicon glyphicon-remove text-danger"></span></button>
+									<button class="btn btn-link hidden" type="button" id="confirm-button" ng-click="changeCapacity($event, key, id)">Click to confirm the change</button>
+									<button class="btn btn-link" type="button" ng-click="confirmRequest($event, key, id)"><span class="glyphicon glyphicon-ok text-success"></span></button>
+									<button class="btn btn-link" type="button" ng-click="switchMode('capacityMode', key, id, $event)"><span class="glyphicon glyphicon-remove text-warning"></span></button>
 								</span>
 							</span>
 							<a href="" ng-click="switchMode('capacityMode', key, id)" ng-hide="capacityMode[key][id] || user().role != 'Graduate Program Director'"><span class="glyphicon glyphicon-pencil"></span></a>
@@ -142,7 +146,7 @@
 					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<h4 class="text-info">Are you sure to register the course {{chosen.courseId}} with the following section?</h4>
 					<li class="list-group-item list-group-item-warning">
-						<p>Time: {{chosen.section.timeslot.startTime}} - {{chosen.section.timeslot.endTime}} on {{chosen.section.weekday}}</p>
+						<p>Time: {{chosen.section.schedule.startTime | formatTime}} - {{chosen.section.schedule.endTime | formatTime}} on {{chosen.section.schedule.weekday}}</p>
 						<p>Instructor: Dr. {{chosen.section.instructor.name}}</p>
 						<p>Location: {{chosen.section.location}}</p>
 					</li>

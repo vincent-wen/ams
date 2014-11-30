@@ -12,7 +12,7 @@
   		<td></td>
   		<td>{{inquiry.title | limitTo : 30}}<span ng-show="inquiry.title.length > 30">...</span></td>
   		<td>{{inquiry.date | date : 'MMM dd HH:mm'}}</td>
-  		<td><a href="" data-toggle="tooltip" data-placement="right" title="Email: {{inquiry.email}}&#10Phone Number: {{inquiry.phoneNumber}}">{{inquiry.author}}</a></td>
+  		<td><a data-toggle="tooltip" data-placement="right" title="Email: {{inquiry.email}}&#10Phone Number: {{inquiry.phoneNumber}}">{{inquiry.author}}</a></td>
   		<td><a href="" ng-click="inquiryDetails(inquiry)"><span class="label label-info">Read Details</span></a></td>
   	</tr>
 	</table>

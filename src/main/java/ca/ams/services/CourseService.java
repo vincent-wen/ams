@@ -14,12 +14,12 @@ public class CourseService {
 	@Autowired
 	private CourseRepository courseRepos;
 	@Autowired
-	private TimeslotRepository timeslotRepos;
-	@Autowired
 	private ProfessorService professorService;
 	
 	private final static String courseIdAndNameRegex = "[\\w\\s]+";
-	private final static String locationRegex = "[A-Za-z]{2}[-_]{1}[\\d]{3}";
+	private final static String locationRegex = "^[A-Za-z]{2}[\\-\\_\\s]{1}[\\d]{3}$";
+	// 00:00 - 23:59
+	private final static String timeRegex = "^(([0-1]{1}[0-9]{1})|2[0-3]{1})\\:[0-5]{1}[0-9]{1}$";
 
 	public List<Course> getCoursesById(String courseId) {
 		if(!courseId.matches(courseIdAndNameRegex)) return null;
@@ -55,10 +55,6 @@ public class CourseService {
 
 	public boolean isSectionFull(CourseSection section) {
 		return section.getEnrolledStudentsId().size() == section.getCapacity();
-	}
-
-	public Timeslot getTimeslotByStartTimeAndEndTime(String startTime, String endTime) {
-		return timeslotRepos.findByStartTimeAndEndTime(startTime, endTime);
 	}
 
 	public void makeFulldressedCourses(List<Course> courses, boolean isStudent) {
@@ -98,7 +94,17 @@ public class CourseService {
 		return section.getEnrolledStudentsId().size() > capacity;
 	}
 
-	public List<Timeslot> getAllTimeslots() {
-		return timeslotRepos.findAll();
+	public boolean validateTime(String time) {
+		return time.matches(timeRegex);
+	}
+
+	public boolean validateWeekday(String weekday) {
+		try {
+			Weekday.valueOf(weekday);
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

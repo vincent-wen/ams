@@ -18,4 +18,11 @@ filter('formatError', function() {
 		}
 		return 'Your operation is not successful. Please try again or contact vincent.wen77@gmail.com.';
 	}
-});
+}).
+
+filter('formatTime', function() {
+	return function(time) {
+		if(time == undefined || time == null) return time;
+		return time.hour+':'+time.minute;
+	};
+});;

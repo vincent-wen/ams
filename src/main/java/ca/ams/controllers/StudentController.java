@@ -109,6 +109,10 @@ public class StudentController {
 			CourseSection section = courseService.getSectionById(sectionId);
 			Student student = studentService.getStudentById(studentId);
 			
+			if(section == null)
+				return new ResponseEntity<String>("Error: The course section is not found.", HttpStatus.NOT_ACCEPTABLE);
+			if(student == null)
+				return new ResponseEntity<String>("Error: The Student is not found.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifSectionAlreadyRegistered(student, section))
 				return new ResponseEntity<String>("Error: The Student has been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
 			if(studentService.ifCourseAlreadyRegistered(student, section))

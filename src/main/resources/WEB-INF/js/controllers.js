@@ -25,8 +25,8 @@ controller('AppCtrl', ['$scope', 'userService', '$window', '$rootScope',
 		});
 	}]).
 
-controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', 'gradingSystem', 'formatErrorFilter',
-	function($scope, $http, userService, timeslotService, gradingSystem, formatErrorFilter){
+controller('CourseCtrl', ['$scope', '$http', 'userService', 'gradingSystem', 'formatErrorFilter',
+	function($scope, $http, userService, gradingSystem, formatErrorFilter){
 		$scope.weekdayPreference = {
 			Monday: true,
 			Tuesday: true,
@@ -34,9 +34,9 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			Thursday: true,
 			Friday: true,
 		}
-		$scope.timeslots = [];
-		$scope.timeslotPreference = {};
-		$scope.weekdayKeys = Object.keys($scope.weekdayPreference);
+		$scope.schedules = [];
+		$scope.schedulePreference = {};
+		$scope.weekdays = Object.keys($scope.weekdayPreference);
 
 		$scope.courseNameorId = '';
 		$scope.studentNameorId = '';
@@ -54,6 +54,11 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 		$scope.searchError = '';
 		$scope.registerError = '';
 		$scope.registerSuccess = '';
+
+		$scope.timeMode = [];
+		$scope.instructorMode = [];
+		$scope.locationMode = [];
+		$scope.capacityMode = [];
 
 		$scope.searchById = function() {
 			$scope.searchError = '';
@@ -88,23 +93,31 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			$http.post('/api/course/search-all')
 			.success(function(data, status) {
 				$scope.courses = data;
+				updateSchedules();
 				if($scope.courses.length == 0) {
 					$scope.searchError = "No corresponding course is found. Please try again.";
 				} 
 			})
 		}
 
-		$scope.sectionFilter = function(section) {
-			return $scope.weekdayPreference[section.weekday] && 
-			$scope.timeslotPreference[section.timeslot.startTime+' - '+section.timeslot.endTime];
+		var updateSchedules = function() {
+			$scope.schedulePreference = {};
+			for(var i=0; i<$scope.courses.length; i++) {
+				for(var j=0; j<$scope.courses[i].courseSections.length; j++) {
+					var schedule = $scope.courses[i].courseSections[j].schedule;
+					var timeslot = schedule.startTime.hour+':'+schedule.startTime.minute+' - '+
+													schedule.endTime.hour+':'+schedule.endTime.minute;
+					$scope.schedulePreference[timeslot] = true;
+				}
+			}
 		}
 
-		$scope.$watch('timeslots()', function() {
-			if(angular.element.isEmptyObject($scope.timeslots())) return;
-			for(var i=0; i<$scope.timeslots().length; i++) {
-				$scope.timeslotPreference[$scope.timeslots()[i].startTime+' - '+$scope.timeslots()[i].endTime] = true;
-			}
-		})
+		$scope.sectionFilter = function(section) {
+			var timeslot = section.schedule.startTime.hour+':'+section.schedule.startTime.minute+' - '+
+											section.schedule.endTime.hour+':'+section.schedule.endTime.minute;
+			return $scope.weekdayPreference[section.schedule.weekday] && 
+			$scope.schedulePreference[timeslot];
+		}
 
 		$scope.registerSectionRequest = function(section, courseId) {
 			$scope.chosen.section = section;
@@ -201,6 +214,101 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			})
 		}
 
+		$scope.switchMode = function(mode, key, id, event) {
+			$scope[mode][key][id] = !$scope[mode][key][id];
+			if(!$scope[mode][key][id]) {
+				var parent = angular.element(event.currentTarget).parent();
+				parent.children('').removeClass('hidden');
+				parent.children('#confirm-button').addClass('hidden');
+			}
+		}
+
+		$scope.confirmRequest = function(event) {
+			var saveButton = angular.element(event.currentTarget);
+			var confirmButton = saveButton.siblings('#confirm-button');
+			saveButton.addClass('hidden');
+			confirmButton.removeClass('hidden');
+		}
+
+		$scope.changeTime = function(event, key, id) {
+			event.preventDefault();
+
+			var section = $scope.courses[key].courseSections[id];
+			var parentElem = angular.element(event.currentTarget).parent();
+			var errorContainer = parentElem.parent().siblings('.text-danger');
+			var schedule = {
+				startTime: parentElem.siblings('input[name="startTime"]').val(),
+				endTime: parentElem.siblings('input[name="endTime"]').val(),
+				weekday: parentElem.siblings('select').val(),
+				sectionObjectId: section.id
+			}
+			$http.post('/api/section/change-time', schedule)
+			.success(function(data, status) {
+				errorContainer.html('');
+				section.schedule.weekday = data.weekday;
+				section.schedule.startTime = data.startTime;
+				section.schedule.endTime = data.endTime;
+				updateSchedules();
+				$scope.switchMode('timeMode', key, id, event);
+			})
+			.error(function(data, status) {
+				errorContainer.html(formatErrorFilter(data));
+			})
+		}
+
+		$scope.changeLocation = function(event, key, id) {
+			event.preventDefault();
+			var confirmButton = angular.element(event.currentTarget);
+			confirmButton.addClass('hidden');
+			confirmButton.siblings().removeClass('hidden');
+
+			var section = $scope.courses[key].courseSections[id];
+			var location = angular.element(event.currentTarget).parent().siblings('input[name="location"]');
+			var errorContainer = location.parent().siblings('.text-danger');
+			var updatedSection = {
+				id: section.id,
+				location: location.val()
+			}
+			$http.post('/api/section/change-location', updatedSection)
+			.success(function(data, status) {
+				errorContainer.html('');
+				section.location = location.val();
+				$scope.switchMode('locationMode', key, id, event);
+			})
+			.error(function(data, status) {
+				errorContainer.html(formatErrorFilter(data));
+			})
+		}
+
+		$scope.changeCapacity = function(event, key, id) {
+			event.preventDefault();
+			var confirmButton = angular.element(event.currentTarget);
+			confirmButton.addClass('hidden');
+			confirmButton.siblings().removeClass('hidden');
+
+			var section = $scope.courses[key].courseSections[id];
+			var capacity = angular.element(event.currentTarget).parent().siblings('input[name="capacity"]');
+			var errorContainer = capacity.parent().siblings('.text-danger');
+
+			if(!capacity.val().match('^[1-9]+\d*$')) {
+				errorContainer.html('Capacity must be an integer at least 1.');
+				return;
+			}
+			var updatedSection = {
+				id: section.id,
+				capacity: capacity.val()
+			}
+			$http.post('/api/section/change-capacity', updatedSection)
+			.success(function(data, status) {
+				errorContainer.html('');
+				section.capacity = capacity.val();
+				$scope.switchMode('capacityMode', key, id, event);
+			})
+			.error(function(data, status) {
+				errorContainer.html(formatErrorFilter(data));
+			})
+		}
+
 		$scope.displayProfessors = function() {
 			angular.element('#professors_list').dropdown();
 		}
@@ -211,6 +319,10 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 
 		$scope.changeInstructor = function(event, key, id) {
 			event.preventDefault();
+			var confirmButton = angular.element(event.currentTarget);
+			confirmButton.addClass('hidden');
+			confirmButton.siblings().removeClass('hidden');
+			
 			var section = $scope.courses[key].courseSections[id];
 			var updatedSection = {
 				id: section.id,
@@ -223,87 +335,7 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'timeslotService', '
 			.success(function(data, status) {
 				errorContainer.html('');
 				section.instructor.name = $scope.instructor[key][id];
-				$scope.switchMode('instructorMode', key, id);
-			})
-			.error(function(data, status) {
-				errorContainer.html(formatErrorFilter(data));
-			})
-		}
-
-		$scope.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-		$scope.timeMode = [];
-		$scope.instructorMode = [];
-		$scope.locationMode = [];
-		$scope.capacityMode = [];
-
-		$scope.switchMode = function(mode, key, id) {
-			$scope[mode][key][id] = !$scope[mode][key][id];
-		}
-
-		$scope.changeTime = function(event, key, id) {
-			event.preventDefault();
-			var section = $scope.courses[key].courseSections[id];
-			var parentElem = angular.element(event.currentTarget).parent();
-			var errorContainer = parentElem.parent().siblings('.text-danger');
-			var updatedSection = {
-				timeslot: {
-					startTime: parentElem.siblings('input[name="startTime"]').val(),
-					endTime: parentElem.siblings('input[name="endTime"]').val(),
-				},
-				weekday: parentElem.siblings('select').val(),
-				id: section.id
-			}
-			$http.post('/api/section/change-time', updatedSection)
-			.success(function(data, status) {
-				errorContainer.html('');
-				section.weekday = updatedSection.weekday;
-				section.timeslot.startTime = updatedSection.timeslot.startTime.trim();
-				section.timeslot.endTime = updatedSection.timeslot.endTime.trim();
-				$scope.switchMode('timeMode', key, id);
-			})
-			.error(function(data, status) {
-				errorContainer.html(formatErrorFilter(data));
-			})
-		}
-
-		$scope.changeLocation = function(event, key, id) {
-			event.preventDefault();
-			var section = $scope.courses[key].courseSections[id];
-			var location = angular.element(event.currentTarget).parent().siblings('input[name="location"]');
-			var errorContainer = location.parent().siblings('.text-danger');
-			var updatedSection = {
-				id: section.id,
-				location: location.val()
-			}
-			$http.post('/api/section/change-location', updatedSection)
-			.success(function(data, status) {
-				errorContainer.html('');
-				section.location = location.val();
-				$scope.switchMode('locationMode', key, id);
-			})
-			.error(function(data, status) {
-				errorContainer.html(formatErrorFilter(data));
-			})
-		}
-
-		$scope.changeCapacity = function(event, key, id) {
-			event.preventDefault();
-			var section = $scope.courses[key].courseSections[id];
-			var capacity = angular.element(event.currentTarget).parent().siblings('input[name="capacity"]');
-			var errorContainer = capacity.parent().siblings('.text-danger');
-			if(capacity.val() != parseInt(capacity.val())) {
-				errorContainer.html('Capacity must be an integer between 10 to 300.');
-				return;
-			}
-			var updatedSection = {
-				id: section.id,
-				capacity: capacity.val()
-			}
-			$http.post('/api/section/change-capacity', updatedSection)
-			.success(function(data, status) {
-				errorContainer.html('');
-				section.capacity = capacity.val();
-				$scope.switchMode('capacityMode', key, id);
+				$scope.switchMode('instructorMode', key, id, event);
 			})
 			.error(function(data, status) {
 				errorContainer.html(formatErrorFilter(data));

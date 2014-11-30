@@ -51,33 +51,35 @@ public class CourseController {
 	}
 	
 	@RequestMapping(value="/api/section/change-time", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<String> changeTime(@RequestBody CourseSection courseSection) {
+	public @ResponseBody ResponseEntity<? extends Object> changeTime(@RequestBody ScheduleWrapper scheduleWrapper) {
 		User user = userService.getCurrentUser();
 		if(user.getRole() == Role.ROLE_GPD) {
-			// find objects
-			CourseSection section = courseService.getSectionById(courseSection.getId());
-			Timeslot newTimeslot = courseService.getTimeslotByStartTimeAndEndTime(courseSection.getTimeslot().getStartTime().trim(), courseSection.getTimeslot().getEndTime().trim());
-			Weekday weekday = courseSection.getWeekday();
-
-			// Handle exceptions before modifications
+			CourseSection section = courseService.getSectionById(scheduleWrapper.getSectionObjectId());
+			scheduleWrapper.setStartTime(scheduleWrapper.getStartTime().trim());
+			scheduleWrapper.setEndTime(scheduleWrapper.getEndTime().trim());
+						
 			if(section == null)
-				return new ResponseEntity<String>("Error: Section not found.", HttpStatus.NOT_FOUND);
-			if(newTimeslot == null)
-				return new ResponseEntity<String>("Error: The timeslot is not found.", HttpStatus.NOT_ACCEPTABLE);
-			if(weekday == null)
+				return new ResponseEntity<String>("Error: Section is not found.", HttpStatus.NOT_FOUND);
+			if(!courseService.validateTime(scheduleWrapper.getStartTime()))
+				return new ResponseEntity<String>("Error: The format of start time is incorrect.", HttpStatus.NOT_ACCEPTABLE);
+			if(!courseService.validateTime(scheduleWrapper.getEndTime()))
+				return new ResponseEntity<String>("Error: The format of end time is incorrect.", HttpStatus.NOT_ACCEPTABLE);
+			if(!courseService.validateWeekday(scheduleWrapper.getWeekday()))
 				return new ResponseEntity<String>("Error: The weekday is not valid.", HttpStatus.NOT_ACCEPTABLE);
-			if(section.getTimeslot().equals(newTimeslot) && section.getWeekday().equals(weekday))
-				return new ResponseEntity<String>("Error: The time is already set.", HttpStatus.NOT_ACCEPTABLE);
 			
+			Schedule schedule = new Schedule(scheduleWrapper.getStartTime(), scheduleWrapper.getEndTime(), scheduleWrapper.getWeekday());
+			if(section.getSchedule().equals(schedule))
+				return new ResponseEntity<String>("Error: The schedule is not changed.", HttpStatus.NOT_ACCEPTABLE);
+			if(!schedule.getStartTime().before(schedule.getEndTime()))
+				return new ResponseEntity<String>("Error: The end time must be later than the start time.", HttpStatus.NOT_ACCEPTABLE);
+			
+			section.setSchedule(schedule);
 			Professor professor = professorService.getProfessorById(section.getInstructorId());
-			if(professorService.isTimeConflictForProfessor(professor, newTimeslot, weekday))
-				return new ResponseEntity<String>("Error: The time is conflit to another course of the same instructor.", HttpStatus.NOT_ACCEPTABLE);
-			
-			// Process modifications
-			section.setTimeslot(newTimeslot);
-			section.setWeekday(weekday);
+			if(professorService.ifSectionConflicts(professor, section))
+				return new ResponseEntity<String>("Error: The schedule is conflit to another course of the same instructor.", HttpStatus.NOT_ACCEPTABLE);
+
 			courseService.save(section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<Schedule>(schedule, HttpStatus.OK);
 		}
 		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
@@ -86,19 +88,23 @@ public class CourseController {
 	public @ResponseBody ResponseEntity<String> changeInstructor(@RequestBody CourseSection courseSection) {
 		User user = userService.getCurrentUser();
 		if(user.getRole() == Role.ROLE_GPD) {
-			// find objects
 			CourseSection section = courseService.getSectionById(courseSection.getId());
-			Professor newInstructor = professorService.getProfessorByName(courseSection.getInstructor().getName());
+			List<Professor> instructors  = professorService.getProfessorsByName(courseSection.getInstructor().getName());
+			if(instructors.size() == 0) {
+				return new ResponseEntity<String>("Error: No professor is found. Please try again.", HttpStatus.NOT_ACCEPTABLE);
+			} else if(instructors.size() > 1) {
+				return new ResponseEntity<String>("Error: More than one professer is found. Please search by the full name of professor.", HttpStatus.NOT_ACCEPTABLE);
+			}
+			Professor newInstructor = instructors.get(0);
 			
-			// Handle exceptions before modifications
 			if(section == null)
 				return new ResponseEntity<String>("Error: Section not found.", HttpStatus.NOT_FOUND);
 			if(newInstructor == null)
 				return new ResponseEntity<String>("Error: Professor not found.", HttpStatus.NOT_FOUND);
 			if(professorService.ifSectionAlreadyRegistered(newInstructor, section))
 				return new ResponseEntity<String>("Error: The professor have already been registered in this course section.", HttpStatus.NOT_ACCEPTABLE);
-			if(professorService.ifSectionsConflict(newInstructor, section))
-				return new ResponseEntity<String>("Error: Time is conflict with another course section for this professor.", HttpStatus.CONFLICT);
+			if(professorService.ifSectionConflicts(newInstructor, section))
+				return new ResponseEntity<String>("Error: Schedule is conflict with another course section for this professor.", HttpStatus.CONFLICT);
 			
 			// Process modifications
 			Professor oldInstructor = professorService.getProfessorById(section.getInstructorId());
@@ -108,7 +114,7 @@ public class CourseController {
 			professorService.save(oldInstructor);
 			professorService.save(newInstructor);
 			courseService.save(section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("Instructor is changed successfully.", HttpStatus.OK);
 		}
 		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
@@ -129,7 +135,7 @@ public class CourseController {
 			// Process modifications
 			section.setLocation(courseSection.getLocation());
 			courseService.save(section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("Location is changed successfully.", HttpStatus.OK);
 		}
 		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
@@ -145,14 +151,14 @@ public class CourseController {
 			if(section == null)
 				return new ResponseEntity<String>("Error: Course section not found.", HttpStatus.NOT_FOUND);
 			if(!courseService.validateCapacity(courseSection.getCapacity()))
-				return new ResponseEntity<String>("Error: Capacity must be an integer larger than 1.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: Capacity must be an integer at least 1.", HttpStatus.NOT_ACCEPTABLE);
 			if(courseService.ifEnrolledStudentsMoreThanCapacity(section, courseSection.getCapacity()))
-				return new ResponseEntity<String>("Error: Capacity must be bigger than the number of students who have been enrolled in this course section.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: Capacity must be at least the number of students who have been enrolled in this course section.", HttpStatus.NOT_ACCEPTABLE);
 
 			// Process modifications
 			section.setCapacity(courseSection.getCapacity());
 			courseService.save(section);
-			return new ResponseEntity<String>("success", HttpStatus.OK);
+			return new ResponseEntity<String>("Capacity is changed successfully.", HttpStatus.OK);
 		}
 		return new ResponseEntity<String>("Error: Forbidden Request.", HttpStatus.FORBIDDEN);
 	}
@@ -180,10 +186,5 @@ public class CourseController {
 			gradingSystem.put(grade.toString(), grade.grade());
 		}
 		return gradingSystem;
-	}
-	
-	@RequestMapping(value="/api/course/get-all-timeslots", method = RequestMethod.POST)
-	public @ResponseBody List<Timeslot> getAllTimeslots() {
-		return courseService.getAllTimeslots();
 	}
 }

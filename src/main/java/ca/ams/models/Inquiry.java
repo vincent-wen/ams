@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Document
 public class Inquiry {
 	@Id
-	protected String id;
+	private String id;
 	private String authorId;
 	private Role role;
 	private String title;

@@ -1,6 +1,8 @@
 package ca.ams.controllers;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,16 +36,35 @@ public class PaymentController {
 		if(user.getRole() == Role.ROLE_STUDENT) {
 			Student student = (Student) user;
 			
-			if(!paymentService.isAmountFormatValid(creditCardWrapper.getAmount()))
-				return new ResponseEntity<String>("Error: Your format of amount is invalid.", HttpStatus.NOT_ACCEPTABLE);
+			// validation
+			List<String> violates = new ArrayList<String>();
+			if(!paymentService.validateAmount(creditCardWrapper.getAmount()))
+				violates.add("Error: Your format of amount is invalid.");
+			if(!paymentService.validateCardType(creditCardWrapper.getType()))
+				violates.add("Error: Your card type is not set or invalid.");
+			if(!paymentService.validateCardNumber(creditCardWrapper.getNumber()))
+				violates.add("Error: Card number should be composed of 16 digits.");
+			if(!paymentService.validateName(creditCardWrapper.getFirstName()))
+				violates.add("Error: First name should contain only letters.");
+			if(!paymentService.validateName(creditCardWrapper.getLastName()))
+				violates.add("Error: Last name should contain only letters.");
+			if(!paymentService.validateExpireMonth(creditCardWrapper.getExpireMonth()))
+				violates.add("Error: The format of month should be 01-12.");
+			if(!paymentService.validateExpireYear(creditCardWrapper.getExpireYear()))
+				violates.add("Error: The format of year should be '2014'.");
+			if(!paymentService.validateCVV2(creditCardWrapper.getCvv2()))
+				violates.add("Error: CVV2 should be a 3-digit number.");
+			if(!violates.isEmpty())
+				return new ResponseEntity<List<String>>(violates, HttpStatus.NOT_ACCEPTABLE);
+			
 			BigDecimal amountToPay = new BigDecimal(creditCardWrapper.getAmount());
-			if(amountToPay.compareTo(student.getTuition()) == 1)
-				return new ResponseEntity<String>("Error: Your payment amount should not be larger than your left tuition to pay.", HttpStatus.NOT_ACCEPTABLE);
+			// if amountToPay > tuition + penalty - amountAlreadyPaid
+			if(amountToPay.compareTo(student.getTuition().add(student.getPenalty().subtract(student.getAlreadyPaid()))) == 1)
+				return new ResponseEntity<String>("Error: Your payment amount should not be larger than the total you need to pay.", HttpStatus.NOT_ACCEPTABLE);
 			
 			Payment createdPayment = paymentService.payByCreditCard(creditCardWrapper);
 			if(createdPayment != null && createdPayment.getState().equals("approved")) {
-				BigDecimal newTuition = student.getTuition().subtract(amountToPay);
-				student.setTuition(newTuition);
+				student.setAlreadyPaid(student.getAlreadyPaid().add(amountToPay));
 				userService.save(student);
 				return new ResponseEntity<Payment>(createdPayment, HttpStatus.OK);
 			}
@@ -58,11 +79,11 @@ public class PaymentController {
 		if(user.getRole() == Role.ROLE_STUDENT) {
 			Student student = (Student) user;
 			
-			if(!paymentService.isAmountFormatValid(amountReq))
+			if(!paymentService.validateAmount(amountReq))
 				return new ResponseEntity<String>("Error: Your format of amount is invalid.", HttpStatus.NOT_ACCEPTABLE);
 			BigDecimal amountToPay = new BigDecimal(amountReq);
 			if(amountToPay.compareTo(student.getTuition()) == 1)
-				return new ResponseEntity<String>("Error: Your payment amount should not be larger than your left tuition to pay.", HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<String>("Error: Your payment amount should not be larger than the total you need to pay.", HttpStatus.NOT_ACCEPTABLE);
 			
 			Payment createdPayment = paymentService.payByPayPalAccount(amountReq);
 			

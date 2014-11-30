@@ -1,5 +1,6 @@
 package ca.ams.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ public class ProfessorService {
 	private ProfessorRepository professorRepos;
 	@Autowired
 	private UserService userService;
+	private final static String nameRegex = "[A-Za-z\\s\\.]+";
 	
 	public Professor create(String name) {
 		Professor professor = new Professor();
@@ -25,6 +27,7 @@ public class ProfessorService {
 	}
 	
 	public List<Professor> getProfessorsByName(String name) {
+		if(name == null || !name.matches(nameRegex)) return new ArrayList<Professor>();
 		List<Professor> professors = professorRepos.findByNameRegex(name);
 		for(Professor professor : professors) {
 			professor.setPassword(null);
@@ -35,23 +38,9 @@ public class ProfessorService {
 	public Professor getProfessorById(String instructorId) {
 		return instructorId == null ? null:professorRepos.findOne(instructorId);
 	}
-	
-	public Professor getProfessorByName(String instructorName) {
-		return professorRepos.findByNameRegex(instructorName).get(0);
-	}
 
 	public List<Professor> getAllProfessors() {
 		return professorRepos.findAll();
-	}
-
-	public boolean ifSectionsConflict(Professor professor, CourseSection section) {
-		for(CourseSection registeredSection : professor.getInstructedSections()) {
-			if(registeredSection.getWeekday().equals(section.getWeekday()) && 
-					registeredSection.getTimeslot().equals(section.getTimeslot())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public boolean ifSectionAlreadyRegistered(Professor professor, CourseSection section) {
@@ -66,10 +55,12 @@ public class ProfessorService {
 		professor.getInstructedSections().clear();
 	}
 
-	public boolean isTimeConflictForProfessor(Professor professor, Timeslot newTimeslot, Weekday weekday) {
-		for(CourseSection section : professor.getInstructedSections()) {
-			if(section.getTimeslot().equals(newTimeslot) && section.getWeekday().equals(weekday))
+	public boolean ifSectionConflicts(Professor professor, CourseSection section) {
+		for(CourseSection registeredSection : professor.getInstructedSections()) {
+			if(!registeredSection.equals(section) && 
+					registeredSection.getSchedule().ifConflicts(section.getSchedule())) {
 				return true;
+			}
 		}
 		return false;
 	}

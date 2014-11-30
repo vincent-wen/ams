@@ -1,7 +1,7 @@
 <h3 class="text-light">Information Inquiry</h3>
 <inquiry>
 	<div class="panel panel-default col-sm-10">
-		<div class="panel-body" ng-hide="isComplete">
+		<div class="panel-body" ng-hide="isComplete" ng-init="confirmSubmit = false">
 			<form class="form-horizontal" name="inquiry_form" role="form" method="POST" ng-submit="inquiry($event)" novalidate>
 				<div class="form-group" ng-class="{
 						'has-error has-feedback': inquiry_form.title.$dirty && inquiry_form.title.$invalid, 
@@ -52,7 +52,8 @@
 						</span>
 					</div>
 				</div>
-				<button class="btn btn-info col-sm-offset-2" type="submit">Submit</button>
+				<button class="btn btn-info col-sm-offset-2" type="button" ng-hide="confirmSubmit" ng-click="confirmSubmit = true">Submit</button>
+				<button class="btn btn-warning col-sm-offset-2" type="submit" ng-show="confirmSubmit" ng-click="confirmSubmit = false">Click to confirm submit</button>
 			</form>
 		</div>
 		<div class="panel-body" ng-show="isComplete">

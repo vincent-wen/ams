@@ -13,8 +13,6 @@ public class AdminService {
 	@Autowired
 	private UserService userService;
 	@Autowired
-	private TimeslotRepository timeslotRepos;
-	@Autowired
 	private CourseSectionRepository sectionRepos;
 	@Autowired
 	private CourseRepository courseRepos;
@@ -38,35 +36,22 @@ public class AdminService {
 		createGPD1();
 		createRegistrar1();
 		
-		Timeslot timeslot1 = new Timeslot();
-		timeslot1.setStartTime("17:45");
-		timeslot1.setEndTime("20:15");
-		timeslotRepos.save(timeslot1);
-		
-		Timeslot timeslot2 = new Timeslot();
-		timeslot2.setStartTime("15:00");
-		timeslot2.setEndTime("17:30");
-		timeslotRepos.save(timeslot2);
-		
-		Timeslot timeslot3 = new Timeslot();
-		timeslot3.setStartTime("11:45");
-		timeslot3.setEndTime("13:00");
-		timeslotRepos.save(timeslot3);
-		
+		Schedule schedule1 = new Schedule("17:45", "20:15", "Monday");
+		Schedule schedule2 = new Schedule("15:00", "17:30", "Tuesday");
+		Schedule schedule3 = new Schedule("11:45", "13:00", "Friday");
+				
 		CourseSection section1 = new CourseSection();
 		section1.setLocation("BL-403");
 		section1.setInstructorId(professor1.getId());
 		professor1.getInstructedSections().add(section1);
-		section1.setTimeslot(timeslot1);
-		section1.setWeekday(Weekday.Monday);
+		section1.setSchedule(schedule1);
 		section1 = sectionRepos.save(section1);
 		
 		CourseSection section2 = new CourseSection();
 		section2.setLocation("BL-803");
 		section2.setInstructorId(professor2.getId());
 		professor2.getInstructedSections().add(section2);
-		section2.setTimeslot(timeslot2);
-		section2.setWeekday(Weekday.Tuesday);
+		section2.setSchedule(schedule2);
 		section2.setCapacity(1);
 		section2 = sectionRepos.save(section2);
 		
@@ -74,24 +59,21 @@ public class AdminService {
 		section3.setLocation("EV-303");
 		section3.setInstructorId(professor3.getId());
 		professor3.getInstructedSections().add(section3);
-		section3.setTimeslot(timeslot2);
-		section3.setWeekday(Weekday.Tuesday);
+		section3.setSchedule(schedule2);
 		section3 = sectionRepos.save(section3);
 		
 		CourseSection section4 = new CourseSection();
 		section4.setLocation("EV-411");
 		section4.setInstructorId(professor3.getId());
 		professor3.getInstructedSections().add(section4);
-		section4.setTimeslot(timeslot3);
-		section4.setWeekday(Weekday.Friday);
+		section4.setSchedule(schedule3);
 		section4 = sectionRepos.save(section4);
 		
 		CourseSection section5 = new CourseSection();
 		section5.setLocation("EV-304");
 		section5.setInstructorId(professor2.getId());
 		professor2.getInstructedSections().add(section5);
-		section5.setTimeslot(timeslot2);
-		section5.setWeekday(Weekday.Tuesday);
+		section5.setSchedule(schedule2);
 		section5 = sectionRepos.save(section5);
 
 		Course course1 = new Course();

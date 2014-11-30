@@ -98,23 +98,6 @@ service('gradingSystem', ['$http', '$rootScope', 'userService',
 		}
 	}]).
 
-service('timeslotService', ['$http', function($http){
-	var timeslots = {};
-	var update = function() {
-		$http.post('/api/course/get-all-timeslots')
-		.success(function(data, status) {
-			timeslots = data;
-		})
-	}
-	update();
-	return {
-		getTimeslots: function() {
-			return timeslots;
-		},
-		updateTimeslots: update
-	}
-}]).
-
 service('paymentResult', function() {
 	var result = {};
 	return {

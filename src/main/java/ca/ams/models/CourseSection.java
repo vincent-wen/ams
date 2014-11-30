@@ -22,8 +22,7 @@ public class CourseSection {
 	private String instructorId;
 	@Transient
 	private Professor instructor;
-	private Timeslot timeslot;
-	private Weekday weekday;
+	private Schedule schedule;
 	@Transient
 	private int size;
 	private int capacity = 200;
@@ -46,18 +45,6 @@ public class CourseSection {
 	}
 	public void setInstructorId(String instructorId) {
 		this.instructorId = instructorId;
-	}
-	public Timeslot getTimeslot() {
-		return timeslot;
-	}
-	public void setTimeslot(Timeslot timeslot) {
-		this.timeslot = timeslot;
-	}
-	public Weekday getWeekday() {
-		return weekday;
-	}
-	public void setWeekday(Weekday weekday) {
-		this.weekday = weekday;
 	}
 	public int getCapacity() {
 		return capacity;
@@ -117,5 +104,11 @@ public class CourseSection {
 	}
 	public void setSize(int size) {
 		this.size = size;
+	}
+	public Schedule getSchedule() {
+		return schedule;
+	}
+	public void setSchedule(Schedule schedule) {
+		this.schedule = schedule;
 	}
 }
