@@ -3,6 +3,7 @@ package ca.ams.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import ca.ams.models.*;
@@ -34,7 +35,7 @@ public class CourseService {
 	}
 	
 	public List<Course> getAllCourses() {
-		return courseRepos.findAll();
+		return courseRepos.findAll(new Sort(Sort.Direction.ASC, "courseName"));
 	}
 	
 	public CourseSection getSectionById(String sectionId) {

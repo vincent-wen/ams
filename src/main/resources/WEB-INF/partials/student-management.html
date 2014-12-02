@@ -16,7 +16,10 @@
 	<!-- Search Results -->
 	<div class="panel-group" id="search-result">
 		<div class="alert alert-danger" role="alert" ng-show="students.length == 0">No student is found. Please try again.</div>
-		
+		<div class="form-group clearfix margin-bottom" ng-show="students.length > 0" style="width: 10%">
+			<div for="filter" class="text-light">items per page:</div>
+			<input name="filter" type="number" min="1" max="100" class="form-control" ng-model="pageSize" ng-init="pageSize = 10">
+		</div>
 		<table class="table table-hover" ng-show="students.length > 0">
 			<tr>
 				<td>Student ID</td>
@@ -25,7 +28,7 @@
 				<td>Program</td>
 				<td></td>
 			</tr>
-			<tr ng-repeat="(key, student) in students">
+			<tr dir-paginate="(key, student) in students | itemsPerPage: pageSize">
 				<td>{{student.studentId}}</td>
 				<td>{{student.name}}</td>
 				<td>{{student.email}}</td>
@@ -34,7 +37,8 @@
 					<a href="" ng-click="showStudentDetails(student)" ><span class="label label-warning">View details</span></a>
 				</td>
 			</tr>
-		</table>	
+		</table>
+		<dir-pagination-controls boundary-links="true" template-url="/api/partials/pagination-tpl"></dir-pagination-controls>
 	</div>
 
 	<student-details student="chosenStudent" role="user().role"></student-details>

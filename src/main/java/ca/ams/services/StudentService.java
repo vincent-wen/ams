@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import ca.ams.models.*;
@@ -121,7 +122,7 @@ public class StudentService {
 	}
 
 	public List<Student> getAllStudents() {
-		return studentRepos.findAll();
+		return studentRepos.findAll(new Sort(Sort.Direction.ASC, "name"));
 	}
 
 	public static String getStudentNameRegex() {

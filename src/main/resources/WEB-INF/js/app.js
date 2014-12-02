@@ -8,7 +8,8 @@ angular.module('app', [
   'app.services',
   'app.directives',
   'ngRoute',
-  'ngAnimate'
+  'ngAnimate',
+  'angularUtils.directives.dirPagination'
 ]).
 
 config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {

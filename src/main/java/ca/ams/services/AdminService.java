@@ -33,6 +33,24 @@ public class AdminService {
 		Student student1 = createStudent1();
 		createStudent2();
 		Student student3 = createStudent3();
+		createStudent4();
+		createStudent5();
+		createStudent6();
+		createStudent7();
+		createStudent8();
+		createStudent9();
+		createStudent10();
+		createStudent11();
+		createStudent12();
+		createStudent13();
+		createStudent14();
+		createStudent15();
+		createStudent16();
+		createStudent17();
+		createStudent18();
+		createStudent19();
+		createStudent20();
+		
 		createGPD1();
 		createRegistrar1();
 		
@@ -184,6 +202,244 @@ public class AdminService {
 		student.setName("Ahmad Al-Sheikh Hassan");
 		student.setRole(Role.ROLE_STUDENT);
 		student.setPhoneNumber("514-430-0000");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent4() {
+		Student student = new Student();
+		student.setUsername("albena");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("albena.ks@gmail.com");
+		student.setStudentId("6283125");
+		student.setProgram("Software Engineering");
+		student.setName("Albena Strupchanska");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0001");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent5() {
+		Student student = new Student();
+		student.setUsername("aber");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("aberabozkhar2@gmail.com");
+		student.setStudentId("6283126");
+		student.setProgram("Software Engineering");
+		student.setName("Aber Abozkhar");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0002");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent6() {
+		Student student = new Student();
+		student.setUsername("alej");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("alejasanchez074@gmail.com");
+		student.setStudentId("6283127");
+		student.setProgram("Software Engineering");
+		student.setName("Alejandra Sánchez");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0003");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent7() {
+		Student student = new Student();
+		student.setUsername("fahim");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("fahimjan56@gmail.com");
+		student.setStudentId("6283128");
+		student.setProgram("Software Engineering");
+		student.setName("Fahim Durrani");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0004");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent8() {
+		Student student = new Student();
+		student.setUsername("prakash");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("prakash163@gmail.com");
+		student.setStudentId("6283129");
+		student.setProgram("Software Engineering");
+		student.setName("Fahim Durrani");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0005");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent9() {
+		Student student = new Student();
+		student.setUsername("afshin");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("afshin@gmail.com");
+		student.setStudentId("6283130");
+		student.setProgram("Software Engineering");
+		student.setName("Afshin Somani");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0006");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent10() {
+		Student student = new Student();
+		student.setUsername("yarona");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("yarona@gmail.com");
+		student.setStudentId("6283131");
+		student.setProgram("Software Engineering");
+		student.setName("Yarona Liang");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0007");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent11() {
+		Student student = new Student();
+		student.setUsername("loay");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("loay@gmail.com");
+		student.setStudentId("6283132");
+		student.setProgram("Software Engineering");
+		student.setName("Loay Gewily");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0008");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent12() {
+		Student student = new Student();
+		student.setUsername("david");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("david@gmail.com");
+		student.setStudentId("6283133");
+		student.setProgram("Software Engineering");
+		student.setName("David Lim");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0009");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent13() {
+		Student student = new Student();
+		student.setUsername("victor");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("victor@gmail.com");
+		student.setStudentId("6283134");
+		student.setProgram("Software Engineering");
+		student.setName("Victor Soledad");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0010");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent14() {
+		Student student = new Student();
+		student.setUsername("yun");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("yun@gmail.com");
+		student.setStudentId("6283135");
+		student.setProgram("Software Engineering");
+		student.setName("Yun Zhang");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0011");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent15() {
+		Student student = new Student();
+		student.setUsername("ahmad2");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("ahmad2@gmail.com");
+		student.setStudentId("6283135");
+		student.setProgram("Software Engineering");
+		student.setName("Ahmad Moumneh");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0011");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent16() {
+		Student student = new Student();
+		student.setUsername("eric");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("eric@gmail.com");
+		student.setStudentId("6283136");
+		student.setProgram("Software Engineering");
+		student.setName("Eric Bozikian");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0012");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent17() {
+		Student student = new Student();
+		student.setUsername("auror");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("auror@gmail.com");
+		student.setStudentId("6283137");
+		student.setProgram("Software Engineering");
+		student.setName("Auror Wen");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0013");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent18() {
+		Student student = new Student();
+		student.setUsername("rudi");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("rudi@gmail.com");
+		student.setStudentId("6283138");
+		student.setProgram("Software Engineering");
+		student.setName("Rudi Fedelmid");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0014");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent19() {
+		Student student = new Student();
+		student.setUsername("coby");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("coby@gmail.com");
+		student.setStudentId("6283139");
+		student.setProgram("Software Engineering");
+		student.setName("Coby Liu");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0015");
+		return studentRepos.save(student);
+	}
+	
+	public Student createStudent20() {
+		Student student = new Student();
+		student.setUsername("rachel");
+		student.setPassword("111111a");
+		userService.encryptPassword(student);
+		student.setEmail("rachel@gmail.com");
+		student.setStudentId("6283140");
+		student.setProgram("Software Engineering");
+		student.setName("Rachel Lim");
+		student.setRole(Role.ROLE_STUDENT);
+		student.setPhoneNumber("514-430-0016");
 		return studentRepos.save(student);
 	}
 	
