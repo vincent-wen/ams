@@ -24,21 +24,26 @@ service('userService', ['$http', '$rootScope', function($http, $rootScope) {
 				professors = data;
 			})
 			if(user.role == "Student") {
+				user.records = {};
+				for(var i=0; i<user.completedCourses.length; i++) {
+					var course = user.completedCourses[i];
+					if(user.records[course.year] == undefined) {
+						user.records[course.year] = {};
+						user.records[course.year][course.term] = [];
+					}
+					if(user.records[course.year][course.term] == undefined) {
+						user.records[course.year][course.term] = [];
+					}
+					user.records[course.year][course.term].push(course);
+				}
 				$rootScope.$emit('student:updated', user);
+				console.log(user);
+			}
+			if(user.role == "Professor") {
+				user.enrolledStudents = {};
 			}
 		});
 	}
-	// var updateCompletedCourses = function(student) {
-	// 	$http.post('/api/student/get-completed-courses', student.id)
-	// 	.success(function(data, status) {
-	// 		if(student == undefined) {
-	// 			user.completedCourses= data;
-	// 		} else {
-	// 			student.completedCourses = data;
-	// 		}
-	// 		$rootScope.$emit('student:completedCourses:updated', student);
-	// 	})	
-	// }
 	update();
 
 	return {
@@ -127,5 +132,12 @@ service('inquiryService', ['$http', function($http) {
 	return {
 		get: function() {return inquires;}
 	}
-}]);
+}]).
+
+service('constants', function() {
+	return {
+		year: '2014-2015',
+		term: 'FALL'
+	}
+});
 

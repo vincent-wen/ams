@@ -378,6 +378,8 @@ controller('profileCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 		$scope.phoneNumberError = '';
 		$scope.emailError = '';
 
+		$scope.termOrder = ['FALL', 'WINTER', 'SUMMER'];
+
 		$scope.$watch('user()', function(user) {
 			if(user == null) return;
 			$scope.phoneNumber = user.phoneNumber;
@@ -469,26 +471,45 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 	function($scope, $http, userService, gradingSystem) {
 		$scope.user = userService.getUser;
 		$scope.chosenStudent = {};
+		$scope.grades = gradingSystem.getGrades;
+		$scope.errorMessage = '';
+		$scope.successMessage = '';
+		$scope.students = [];
 
 		$scope.searchById = function() {
 			$http.post('/api/student/search-by-id', $scope.studentNameorId)
 			.success(function(data, status) {
 				$scope.students = data;
+				$scope.errorMessage = '';
 			})
+			.error(function(data) {
+				$scope.successMessage = '';
+				$scope.errorMessage = data;
+			});
 		}
 
 		$scope.searchByName = function() {
 			$http.post('/api/student/search-by-name', $scope.studentNameorId)
 			.success(function(data, status) {
 				$scope.students = data;
+				$scope.errorMessage = '';
 			})
+			.error(function(data) {
+				$scope.successMessage = '';
+				$scope.errorMessage = data;
+			});
 		}
 
 		$scope.searchAll = function() {
 			$http.post('/api/student/search-all', {})
 			.success(function(data, status) {
 				$scope.students = data;
+				$scope.errorMessage = '';
 			})
+			.error(function(data) {
+				$scope.successMessage = '';
+				$scope.errorMessage = data;
+			});
 		}
 
 		$scope.showStudentDetails = function(student) {
@@ -508,6 +529,8 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 				}).modal('show');
 			})
 		}
+
+		
 	}]).
 
 controller('paymentCtrl', ['$scope', '$routeParams', '$location', 'paymentResult',
@@ -533,4 +556,55 @@ controller('inquiryCtrl', ['$scope', 'inquiryService', function($scope, inquiryS
 			backdrop: 'static'
 		}).modal('show');
 	}
-}]);
+}]).
+
+controller('gradeCtrl', ['$scope', '$http', 'userService', 'gradingSystem', 'constants',
+	function($scope, $http, userService, gradingSystem, constants) {
+
+		$scope.grades = gradingSystem.getGrades;
+		$scope.grade = {};
+		$scope.user = userService.getUser;
+		$scope.errorMessage = '';
+		$scope.successMessage = '';
+		$scope.selected = {};
+		$scope.enrolledStudents = '';
+		$scope.confirmSubmit = false;
+
+		$scope.showEnrolledStudents = function(sectionObjectId) {
+			$http.post('/api/student/get-enrolled-students', sectionObjectId)
+			.success(function(data, stats) {
+				$scope.enrolledStudents = data;
+			})
+		}
+
+		$scope.getGrade = function(student) {
+			// student will have no or just this completed course.
+			$scope.grade[student.id] = '';
+			for(var i=0; i<student.completedCourses.length; i++) {
+				if(student.completedCourses[i].id == $scope.selected.section.courseObjectId) {
+					$scope.grade[student.id] = student.completedCourses[i].grade;
+				}
+			}
+		}
+
+		$scope.submitGrades = function() {
+			var students = [];
+			for(var studentObjectId in $scope.grade) {
+				students.push({
+					id: studentObjectId,
+					completedCourses: [{
+						id: $scope.selected.section.courseObjectId,
+						grade: $scope.grade[studentObjectId],
+						year: constants.year,
+						term: constants.term
+					}],
+				})
+			}
+			$http.post('/api/student/submit-grades', students)
+			.success(function(data, status) {
+				$scope.confirmSubmit = false;
+				$scope.successMessage = data;
+				$scope.showEnrolledStudents;
+			})
+		}
+	}]);

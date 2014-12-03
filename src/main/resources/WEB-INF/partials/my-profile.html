@@ -59,21 +59,27 @@
 		</table>
 	</div>
 	<div class="panel panel-success" ng-show="user().role == 'Student'">
-		<div class="panel-heading">Cpmpleted Courses:</div>
-		<table class="table table-hover my-tables">
-			<tr>
-				<th>Course ID</th>
-				<th>Course name</th>
-				<th>Credits</th>
-				<th>Grade</th>
-			</tr>
-			<tr ng-repeat="course in user().completedCourses">
-				<td>{{course.courseId}}</td>
-				<td>{{course.courseName}}</td>
-				<td>{{course.credits}}</td>
-				<td>{{course.grade}} ({{grades()[course.grade]}})</td>
-			</tr>
-		</table>
+		<div class="panel-heading">Student Record:</div>
+		<div ng-repeat="(year, terms) in user().records | orderBy">
+			<h4 class="text-center text-primary"><strong>ACADEMIC YEAR {{year}}</strong></h4>
+			<div ng-repeat="(term, courses) in terms | orderBy: termOrder">
+				<h4 class="text-center">{{term}}</h4>
+				<table class="table table-hover my-tables">
+					<tr>
+						<th>Course ID</th>
+						<th>Course name</th>
+						<th>Credits</th>
+						<th>Grade</th>
+					</tr>
+					<tr ng-repeat="course in courses">
+						<td>{{course.courseId}}</td>
+						<td>{{course.courseName}}</td>
+						<td>{{course.credits}}</td>
+						<td>{{course.grade}} ({{grades()[course.grade]}})</td>
+					</tr>
+				</table>
+			</div>
+		</div>
 		<div class="panel-body">
 			<p>GPA: {{user().GPA || 0}}</p>
 			<p>Have earn credits: {{user().earnCredits}}</p>

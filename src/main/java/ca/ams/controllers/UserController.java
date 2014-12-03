@@ -64,6 +64,14 @@ public class UserController {
 		if(user.getRole() == Role.ROLE_STUDENT) {
 			studentService.makeFulldressedStudent((Student) user);
 		}
+		if(user.getRole() == Role.ROLE_PROFESSOR) {
+			for(CourseSection section : ((Professor) user).getInstructedSections()) {
+				Course course = courseService.getCourseById(section.getCourseObjectId());
+				section.setCourseId(course.getCourseId());
+				section.setCourseName(course.getCourseName());
+				section.setEnrolledStudentsId(null);
+			}
+		}
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 	

@@ -17,6 +17,8 @@ public class CourseSection {
 	private String courseObjectId;
 	@Transient
 	private String courseId;
+	@Transient
+	private String courseName;
 	private String location;
 
 	private String instructorId;
@@ -110,5 +112,11 @@ public class CourseSection {
 	}
 	public void setSchedule(Schedule schedule) {
 		this.schedule = schedule;
+	}
+	public String getCourseName() {
+		return courseName;
+	}
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
 	}
 }

@@ -1,0 +1,52 @@
+<div ng-controller="gradeCtrl">
+	<h4 class="text-light">Please choose a course to submit grades.</h4>
+	<div class="radio" ng-repeat="section in user().instructedSections" style="color: white">
+	  <label>
+	    <input type="radio" name="sections" ng-model="selected.section" ng-value="section">
+	    {{section.courseId}} {{section.courseName}} (Section: {{section.schedule.startTime | formatTime}} - {{section.schedule.endTime | formatTime}} on {{section.schedule.weekday}})
+	  </label>
+	</div>
+	<button class="btn btn-default margin-bottom" ng-click="showEnrolledStudents(selected.section.id)">Select</button>
+
+	<!-- Grades Section -->
+	<div class="alert alert-danger" role="alert" ng-hide="errorMessage == ''">{{errorMessage | formatError}}</div>
+	<div class="alert alert-success" role="alert" ng-hide="successMessage == ''" ng-init="successMessage = ''">{{successMessage}}</div>
+	<div class="panel panel-success" ng-hide="enrolledStudents==''">
+		<div class="panel-heading">Enrolled Students List</div>
+		<div class="panel-body" ng-show="enrolledStudents.length == 0">No Student is registered in this course section.</div>
+		<div class="panel-body" ng-hide="enrolledStudents.length == 0">
+			<div class="form-group clearfix margin-bottom" style="width: 10%">
+				<div for="filter">items per page:</div>
+				<input name="filter" type="number" min="1" max="100" class="form-control" ng-model="pageSize" ng-init="pageSize = 10">
+			</div>
+			<!-- Grades assignment table -->
+			<div ng-init="confirmSubmit = false">
+				<table class="table table-hover">
+					<tr>
+						<td>Student ID</td>
+						<td>Name</td>
+						<td>Email</td>
+						<td>Program</td>
+						<td>Grades</td>
+					</tr>
+					<tr dir-paginate="student in enrolledStudents | itemsPerPage: pageSize">
+						<td>{{student.studentId}}</td>
+						<td>{{student.name}}</td>
+						<td>{{student.email}}</td>
+						<td>{{student.program}}</td>
+						<td>
+							<select ng-model="grade[student.id]" ng-options="letter as letter+' ('+number+') ' for (letter, number) in grades()" ng-init="getGrade(student)">
+								<option value="">-- choose grade --</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<dir-pagination-controls boundary-links="true" template-url="/api/partials/pagination-tpl"></dir-pagination-controls>
+		</div>
+		<div class="panel-footer text-right">
+				<button type="button" class="btn btn-info" ng-hide="confirmSubmit" ng-click="confirmSubmit = true">Submit</button>
+				<button type="button" class="btn btn-warning" ng-show="confirmSubmit" ng-click="submitGrades()">Confirm to Submit Grades</button>
+		</div>
+	</div>
+</div>

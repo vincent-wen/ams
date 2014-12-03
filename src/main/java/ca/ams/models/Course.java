@@ -19,8 +19,9 @@ public class Course {
 	private double credits;
 	private String courseName;
 	private String courseDescription;
-	@Transient
 	private String grade;
+	private String year;
+	private Term term;
 	private List<String> prerequisiteCourseIds = new ArrayList<String>();
 	@DBRef
 	private List<CourseSection> courseSections = new ArrayList<CourseSection>();
@@ -67,5 +68,24 @@ public class Course {
 	public void setGrade(String grade) {
 		this.grade = grade;
 	}	
-	
+	public void setCourseCompleted(String grade, String year, Term term) {
+		this.courseSections = null;
+		this.prerequisiteCourseIds = null;
+		this.courseDescription = null;
+		this.setGrade(grade);
+		this.setYear(year);
+		this.setTerm(term);
+	}
+	public String getYear() {
+		return year;
+	}
+	public void setYear(String year) {
+		this.year = year;
+	}
+	public Term getTerm() {
+		return term;
+	}
+	public void setTerm(Term term) {
+		this.term = term;
+	}
 }

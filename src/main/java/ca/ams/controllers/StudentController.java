@@ -1,5 +1,7 @@
 package ca.ams.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,44 +29,46 @@ public class StudentController {
 	private ProfessorService professorService;
 	
 	@RequestMapping(value="/api/student/search-by-id", method = RequestMethod.POST)
-	public @ResponseBody List<Student> searchById(@RequestBody String studentId) {
+	public @ResponseBody ResponseEntity<? extends Object> searchById(@RequestBody String studentId) {
 		Role role = userService.getCurrentUser().getRole();
-		if(role.toString().matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+		if(role.toString().matches("ROLE_GPD|ROLE_REGISTRAR")) {
 			List<Student> students = studentService.getStudentsById(studentId);
-			if(students == null) return null;
+			if(students == null) 
+				return new ResponseEntity<String>("Error: No student is found. Please try with other inputs.", HttpStatus.NOT_FOUND);
 			for(Student student : students) {
 				student.setPassword(null);
 			}
-			return students;
+			return new ResponseEntity<List<Student>>(students, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<String>("Error: No student is found. Please try with other inputs.", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/search-by-name", method = RequestMethod.POST)
-	public @ResponseBody List<Student> searchByName(@RequestBody String studentName) {
+	public @ResponseBody ResponseEntity<? extends Object> searchByName(@RequestBody String studentName) {
 		Role role = userService.getCurrentUser().getRole();
-		if(role.toString().matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+		if(role.toString().matches("ROLE_GPD|ROLE_REGISTRAR")) {
 			List<Student> students = studentService.getStudentsByName(studentName);
-			if(students == null) return null;
+			if(students == null) 
+				return new ResponseEntity<String>("Error: No student is found. Please try with other inputs.", HttpStatus.NOT_FOUND);
 			for(Student student : students) {
 				student.setPassword(null);
 			}
-			return students;
+			return new ResponseEntity<List<Student>>(students, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<String>("Error: No student is found. Please try with other inputs.", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/search-all", method = RequestMethod.POST)
-	public @ResponseBody List<Student> searchAll() {
+	public @ResponseBody ResponseEntity<? extends Object> searchAll() {
 		Role role = userService.getCurrentUser().getRole();
-		if(role.toString().matches("ROLE_GPD|ROLE_PROFESSOR|ROLE_REGISTRAR")) {
+		if(role.toString().matches("ROLE_GPD|ROLE_REGISTRAR")) {
 			List<Student> students = studentService.getAllStudents();
 			for(Student student : students) {
 				student.setPassword(null);
 			}
-			return students;
+			return new ResponseEntity<List<Student>>(students, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<String>("Error: No student is found. Please try with other inputs.", HttpStatus.NOT_ACCEPTABLE);
 	}
 	
 	@RequestMapping(value="/api/student/register-course", method = RequestMethod.POST)
@@ -181,5 +185,35 @@ public class StudentController {
 			return student;
 		}
 		return null;
+	}
+	
+	@RequestMapping(value="/api/student/get-enrolled-students", method = RequestMethod.POST)
+	public @ResponseBody List<Student> getEnrolledStudents(@RequestBody String sectionObjectId) {
+		User user = userService.getCurrentUser();
+		List<Student> students = new ArrayList<Student>();
+		if(user.getRole() == Role.ROLE_PROFESSOR) {
+			Professor professor = (Professor) user;
+			for(CourseSection section : professor.getInstructedSections()) {
+				if(!section.getId().equals(sectionObjectId)) continue;
+				for(String studentId : section.getEnrolledStudentsId()) {
+					Student student = studentService.getStudentById(studentId);
+					studentService.getEnrolledStudent(student, section.getCourseObjectId());
+					students.add(student);
+				}
+			}
+		}
+		return students;
+	}
+	
+	@RequestMapping(value="/api/student/submit-grades", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<String> submitGrades(@RequestBody List<Student> students) {
+		User user = userService.getCurrentUser();
+		if(user.getRole() == Role.ROLE_PROFESSOR) {
+			for(Student student : students) {
+				studentService.saveGrades(student);
+			}
+			return new ResponseEntity<String>("Grades are submited successfully.", HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Error: You are not authorized to submit grades.", HttpStatus.NOT_ACCEPTABLE);
 	}
 }

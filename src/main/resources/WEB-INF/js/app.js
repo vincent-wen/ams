@@ -32,6 +32,9 @@ config(['$routeProvider', '$locationProvider', function($routeProvider, $locatio
   when('/inquiries', {
     templateUrl: '/api/partials/display-inquiries'
   }).
+  when('/grade-submit', {
+    templateUrl: '/api/partials/grade-submit'
+  }).
   when('/payment/paypal/:payment_result', {
     templateUrl: '/api/partials/tuition-payment',
     controller: 'paymentCtrl'

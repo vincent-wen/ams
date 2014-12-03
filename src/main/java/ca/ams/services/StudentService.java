@@ -1,6 +1,7 @@
 package ca.ams.services;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -59,12 +60,20 @@ public class StudentService {
 	}
 
 	public boolean ifCourseAlreadyCompleted(Student student, CourseSection section) {
-		return student.getCompletedCoursesAndGrades().containsKey(section.getCourseObjectId());
+		for(Course course : student.getCompletedCourses()) {
+			if(course.getId().equals(section.getCourseObjectId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<String> getPrerequisitesNotFulfilled(Student student, CourseSection section) {
 		Course course = courseService.getCourseById(section.getCourseObjectId());
-		Set<String> completedCourseIds = student.getCompletedCoursesAndGrades().keySet();
+		List<String> completedCourseIds = new ArrayList<String>(); 
+		for(Course completedCourse : student.getCompletedCourses()) {
+			completedCourseIds.add(completedCourse.getId());
+		}
 		List<String> prerequisitesNotFulfilled = new ArrayList<String>();
 		for (String courseObjectId : course.getPrerequisiteCourseIds()) {
 			if (completedCourseIds.contains(courseObjectId))
@@ -152,18 +161,40 @@ public class StudentService {
 			professorService.clearSensitiveInfo(instructor);
 			section.setInstructor(instructor);
 		}
-		for (String courseId : student.getCompletedCoursesAndGrades().keySet()) {
-			Course course = courseService.getCourseById(courseId);
-			String grade = student.getCompletedCoursesAndGrades().get(courseId);
+	}
 
-			course.setCourseDescription(null);
-			course.setId(null);
-			course.getCourseSections().clear();
-			course.getPrerequisiteCourseIds().clear();
-			course.setGrade(grade);
-
-			student.getCompletedCourses().add(course);
+	public void getEnrolledStudent(Student student, String courseObjectId) {
+		student.setPassword(null);
+		Iterator<Course> courses = student.getCompletedCourses().iterator();
+		while(courses.hasNext()) {
+			if(courses.next().getId().equals(courseObjectId)) {
+				continue;
+			}
+			courses.remove();
 		}
-		student.setCompletedCoursesAndGrades(null);
+		student.setAlreadyPaid(null);
+		student.setPenalty(null);
+		student.setTuition(null);
+		student.setUsername(null);
+		student.getRegisteredSections().clear();
+	}
+
+	public void saveGrades(Student simpleStudent) {
+		Student student = getStudentById(simpleStudent.getId());
+		for(Course simpleCourse : simpleStudent.getCompletedCourses()) {
+			for(Course completedCourse : student.getCompletedCourses()) {
+				if(completedCourse.getId().equals(simpleCourse.getId())) {
+					completedCourse.setGrade(simpleCourse.getGrade());
+					completedCourse.setYear(simpleCourse.getYear());
+					completedCourse.setTerm(simpleCourse.getTerm());
+					save(student);
+					return;
+				}
+			}
+			Course course = courseService.getCourseById(simpleCourse.getId());
+			course.setCourseCompleted(simpleCourse.getGrade(), simpleCourse.getYear(), simpleCourse.getTerm());
+			student.getCompletedCourses().add(course);			
+		}
+		save(student);
 	}
 }

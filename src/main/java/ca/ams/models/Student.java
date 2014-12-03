@@ -3,7 +3,6 @@ package ca.ams.models;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.data.annotation.Transient;
@@ -20,10 +19,8 @@ public class Student extends User{
 	private String program;
 	@DBRef
 	private List<CourseSection> registeredSections = new ArrayList<CourseSection>();
-	// <course object id, grade>
-	private HashMap<String, String> completedCoursesAndGrades = new HashMap<String, String>();
-	@Transient
 	private List<Course> completedCourses = new ArrayList<Course>();
+	@Transient
 	private BigDecimal tuition = new BigDecimal("6000.00");
 	private BigDecimal alreadyPaid = new BigDecimal(0);
 	@Transient
@@ -45,9 +42,6 @@ public class Student extends User{
 	public List<CourseSection> getRegisteredSections() {
 		return registeredSections;
 	}
-	public HashMap<String, String> getCompletedCoursesAndGrades() {
-		return completedCoursesAndGrades;
-	}
 	public String getStudentId() {
 		return studentId;
 	}
@@ -59,13 +53,6 @@ public class Student extends User{
 	}
 	public void setProgram(String program) {
 		this.program = program;
-	}
-	public List<Course> getCompletedCourses() {
-		return completedCourses;
-	}
-	public void setCompletedCoursesAndGrades(
-			HashMap<String, String> completedCoursesAndGrades) {
-		this.completedCoursesAndGrades = completedCoursesAndGrades;
 	}
 	public BigDecimal getTuition() {
 		return tuition;
@@ -88,6 +75,10 @@ public class Student extends User{
 
 	public void setAlreadyPaid(BigDecimal alreadyPaid) {
 		this.alreadyPaid = alreadyPaid;
+	}
+
+	public List<Course> getCompletedCourses() {
+		return completedCourses;
 	}
 	
 }

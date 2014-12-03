@@ -29,9 +29,6 @@ public class ProfessorService {
 	public List<Professor> getProfessorsByName(String name) {
 		if(name == null || !name.matches(nameRegex)) return new ArrayList<Professor>();
 		List<Professor> professors = professorRepos.findByNameRegex(name);
-		for(Professor professor : professors) {
-			professor.setPassword(null);
-		}
 		return professors;
 	}
 	
