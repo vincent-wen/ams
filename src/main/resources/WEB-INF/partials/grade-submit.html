@@ -10,7 +10,7 @@
 
 	<!-- Grades Section -->
 	<div class="alert alert-danger" role="alert" ng-hide="errorMessage == ''">{{errorMessage | formatError}}</div>
-	<div class="alert alert-success" role="alert" ng-hide="successMessage == ''" ng-init="successMessage = ''">{{successMessage}}</div>
+	<div class="alert alert-success" role="alert" ng-hide="successMessage == ''">{{successMessage}}</div>
 	<div class="panel panel-success" ng-hide="enrolledStudents==''">
 		<div class="panel-heading">Enrolled Students List</div>
 		<div class="panel-body" ng-show="enrolledStudents.length == 0">No Student is registered in this course section.</div>

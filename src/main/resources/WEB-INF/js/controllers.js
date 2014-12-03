@@ -575,6 +575,7 @@ controller('gradeCtrl', ['$scope', '$http', 'userService', 'gradingSystem', 'con
 		$scope.showEnrolledStudents = function(sectionObjectId) {
 			$http.post('/api/student/get-enrolled-students', sectionObjectId)
 			.success(function(data, stats) {
+				$scope.successMessage = '';
 				$scope.enrolledStudents = data;
 			})
 		}
