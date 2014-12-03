@@ -81,7 +81,7 @@
 			</div>
 		</div>
 		<div class="panel-body">
-			<p>GPA: {{user().GPA || 0}}</p>
+			<p>GPA: {{user().GPA || 0 | number}}</p>
 			<p>Have earn credits: {{user().earnCredits}}</p>
 		</div>
 	</div>
