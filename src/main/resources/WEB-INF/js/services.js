@@ -24,20 +24,8 @@ service('userService', ['$http', '$rootScope', function($http, $rootScope) {
 				professors = data;
 			})
 			if(user.role == "Student") {
-				user.records = {};
-				for(var i=0; i<user.completedCourses.length; i++) {
-					var course = user.completedCourses[i];
-					if(user.records[course.year] == undefined) {
-						user.records[course.year] = {};
-						user.records[course.year][course.term] = [];
-					}
-					if(user.records[course.year][course.term] == undefined) {
-						user.records[course.year][course.term] = [];
-					}
-					user.records[course.year][course.term].push(course);
-				}
+				updateStudentRecord(user);
 				$rootScope.$emit('student:updated', user);
-				console.log(user);
 			}
 			if(user.role == "Professor") {
 				user.enrolledStudents = {};
@@ -45,6 +33,20 @@ service('userService', ['$http', '$rootScope', function($http, $rootScope) {
 		});
 	}
 	update();
+	var updateStudentRecord = function(student) {
+		student.records = {};
+		for(var i=0; i<student.completedCourses.length; i++) {
+			var course = student.completedCourses[i];
+			if(student.records[course.year] == undefined) {
+				student.records[course.year] = {};
+				student.records[course.year][course.term] = [];
+			}
+			if(student.records[course.year][course.term] == undefined) {
+				student.records[course.year][course.term] = [];
+			}
+			student.records[course.year][course.term].push(course);
+		}
+	}
 
 	return {
 		getUser: function() {
@@ -53,7 +55,8 @@ service('userService', ['$http', '$rootScope', function($http, $rootScope) {
 		updateUser: update,
 		getProfessors: function() {
 			return professors;
-		}
+		},
+		updateStudentRecord : updateStudentRecord
 	};
 }]).
 

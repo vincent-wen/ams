@@ -343,17 +343,18 @@ controller('CourseCtrl', ['$scope', '$http', 'userService', 'gradingSystem', 'fo
 		}
 
 		$scope.showStudentDetails = function(student) {
-			if($scope.user().role == 'Professor') {
-				$scope.chosen.student = student;
-				angular.element('#student-details').modal({
-					backdrop: 'static'
-				}).modal('show');
-				return;
-			}
+			// if($scope.user().role == 'Professor') {
+			// 	$scope.chosen.student = student;
+			// 	angular.element('#student-details').modal({
+			// 		backdrop: 'static'
+			// 	}).modal('show');
+			// 	return;
+			// }
 			$http.post('/api/student/get-detailed-student', student.id)
 			.success(function(data, status) {
 				$scope.chosen.student = data;
 				gradingSystem.update($scope.chosen.student);
+				userService.updateStudentRecord($scope.chosen.student);
 				angular.element('#student-details').modal({
 					backdrop: 'static'
 				}).modal('show');
@@ -513,16 +514,17 @@ controller('StudentCtrl', ['$scope', '$http', 'userService', 'gradingSystem',
 		}
 
 		$scope.showStudentDetails = function(student) {
-			if($scope.user().role == 'Professor') {
-				$scope.chosenStudent = student;
-				angular.element('#student-details').modal({
-					backdrop: 'static'
-				}).modal('show');
-				return;
-			}
+			// if($scope.user().role == 'Professor') {
+			// 	$scope.chosenStudent = student;
+			// 	angular.element('#student-details').modal({
+			// 		backdrop: 'static'
+			// 	}).modal('show');
+			// 	return;
+			// }
 			$http.post('/api/student/get-detailed-student', student.id)
 			.success(function(data, status) {
 				$scope.chosenStudent = data;
+				userService.updateStudentRecord($scope.chosenStudent);
 				gradingSystem.update($scope.chosenStudent);
 				angular.element('#student-details').modal({
 					backdrop: 'static'
