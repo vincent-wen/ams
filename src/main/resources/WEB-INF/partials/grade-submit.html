@@ -35,7 +35,7 @@
 						<td>{{student.email}}</td>
 						<td>{{student.program}}</td>
 						<td>
-							<select ng-model="grade[student.id]" ng-options="letter as letter+' ('+number+') ' for (letter, number) in grades()" ng-init="getGrade(student)">
+							<select ng-model="grade[student.id]" ng-options="grade[0] as grade[0]+' ('+grade[1]+') ' for grade in sortedGrades()" ng-init="getGrade(student)">
 								<option value="">-- choose grade --</option>
 							</select>
 						</td>

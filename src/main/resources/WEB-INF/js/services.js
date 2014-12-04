@@ -63,6 +63,7 @@ service('userService', ['$http', '$rootScope', function($http, $rootScope) {
 service('gradingSystem', ['$http', '$rootScope', 'userService', 
 	function($http, $rootScope, userService) {
 		var grades = null;
+		var sortedGrades = [];
 		var GPA = {};
 		var earnCredits = {};
 		var user = userService.getUser;
@@ -71,11 +72,24 @@ service('gradingSystem', ['$http', '$rootScope', 'userService',
 			$http.post('/api/course/get-grading-system')
 			.success(function(data, status) {
 				grades = data;
+				sortedGrades = sortGrades(grades);
 				if(user() != null && user().role == "Student")
 					calculateGPAandCredits(user());
 			})
 		}
 		update();
+
+		var sortGrades = function(grades) {
+			var array = [];
+			for(var letter in grades) {
+				array.push([letter, grades[letter]]);
+			}
+			array.sort(function(a, b) {
+				return b[1] - a[1];
+			})
+			console.log(array);
+			return array;
+		}
 
 		var calculateGPAandCredits = function(student) {
 			var sumCredits = 0;
@@ -99,6 +113,9 @@ service('gradingSystem', ['$http', '$rootScope', 'userService',
 		return {
 			getGrades: function() {
 				return grades;
+			},
+			getSortedGrades: function() {
+				return sortedGrades;
 			},
 			update: function(student) {
 				return calculateGPAandCredits(student);
@@ -137,10 +154,24 @@ service('inquiryService', ['$http', function($http) {
 	}
 }]).
 
-service('constants', function() {
+service('constants', ['$http', function($http) {
+	var year = '';
+	var term = '';
+	$http.get('/api/get-current-year')
+	.success(function(data) {
+		year = data;
+	})
+	$http.get('/api/get-current-term')
+	.success(function(data) {
+		term = data;
+	})
 	return {
-		year: '2014-2015',
-		term: 'FALL'
+		year: function() {
+			return year;
+		},
+		term: function() {
+			return term;
+		}
 	}
-});
+}]);
 

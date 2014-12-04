@@ -564,6 +564,7 @@ controller('gradeCtrl', ['$scope', '$http', 'userService', 'gradingSystem', 'con
 	function($scope, $http, userService, gradingSystem, constants) {
 
 		$scope.grades = gradingSystem.getGrades;
+		$scope.sortedGrades = gradingSystem.getSortedGrades;
 		$scope.grade = {};
 		$scope.user = userService.getUser;
 		$scope.errorMessage = '';
@@ -598,8 +599,8 @@ controller('gradeCtrl', ['$scope', '$http', 'userService', 'gradingSystem', 'con
 					completedCourses: [{
 						id: $scope.selected.section.courseObjectId,
 						grade: $scope.grade[studentObjectId],
-						year: constants.year,
-						term: constants.term
+						year: constants.year(),
+						term: constants.term()
 					}],
 				})
 			}

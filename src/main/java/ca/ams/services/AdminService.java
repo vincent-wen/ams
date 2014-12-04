@@ -144,10 +144,10 @@ public class AdminService {
 		professorRepos.save(professor2);
 		professorRepos.save(professor3);
 		
-		course3.setCourseCompleted(Grade.A.toString(), "2013-2014", Term.WINTER);
+		course3.setCourseCompleted(Grade.A.toString(), "2013 - 2014", Term.WINTER);
 		student3.getCompletedCourses().add(course3);
-		course4.setCourseCompleted(Grade.Aplus.toString(), "2014-2015", Term.FALL);
-		course2.setCourseCompleted(Grade.Aplus.toString(), "2013-2014", Term.FALL);
+		course4.setCourseCompleted(Grade.Aplus.toString(), "2014 - 2015", Term.FALL);
+		course2.setCourseCompleted(Grade.Aplus.toString(), "2013 - 2014", Term.FALL);
 		student3.getCompletedCourses().add(course4);
 		student3.getCompletedCourses().add(course2);
 		studentRepos.save(student3);

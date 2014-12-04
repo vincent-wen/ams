@@ -1,6 +1,7 @@
 package ca.ams.controllers;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -187,4 +188,34 @@ public class CourseController {
 		}
 		return gradingSystem;
 	}
+	
+	@RequestMapping(value="/api/get-current-term", method = RequestMethod.GET)
+	public @ResponseBody String getCurrentTerm() {
+		Calendar cal = Calendar.getInstance();  
+	    int month = cal.get(Calendar.MONTH);
+	    String term = null;
+	    if(month==Calendar.JANUARY || month==Calendar.FEBRUARY || month==Calendar.MARCH || month==Calendar.APRIL) {
+	    	term = Term.WINTER.toString();
+	    } else if(month==Calendar.MAY || month==Calendar.JUNE || month==Calendar.JULY || month==Calendar.AUGUST) {
+	    	term = Term.SUMMER.toString();
+	    } else {
+	    	term = Term.FALL.toString();
+	    }
+		return term;
+	}
+	
+	@RequestMapping(value="/api/get-current-year", method = RequestMethod.GET)
+	public @ResponseBody String getCurrentYear() {
+		Calendar cal = Calendar.getInstance();  
+	    int year = cal.get(Calendar.YEAR);
+	    String academicYear = null;
+	    if(getCurrentTerm().equals(Term.FALL.toString())) {
+	    	academicYear = year+" - "+(year+1);
+	    } else {
+	    	academicYear = (year-1)+" - "+year;
+	    }
+	    return academicYear;
+	}
+	
+	
 }
