@@ -182,6 +182,7 @@ public class StudentService {
 	public void saveGrades(Student simpleStudent) {
 		Student student = getStudentById(simpleStudent.getId());
 		for(Course simpleCourse : simpleStudent.getCompletedCourses()) {
+			if(simpleCourse.getGrade() == null || simpleCourse.getGrade().isEmpty()) continue;
 			for(Course completedCourse : student.getCompletedCourses()) {
 				if(completedCourse.getId().equals(simpleCourse.getId())) {
 					completedCourse.setGrade(simpleCourse.getGrade());
