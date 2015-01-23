@@ -26,14 +26,14 @@ Testing Account
 ####Payment Account
 * PayPal credit card account:
 
-      Credit card number:
-      4214021790362958
-      Credit card type:
-      Visa
-      Expiration date:
-      11/2019
+        Credit card number:
+        4214021790362958
+        Credit card type:
+        Visa
+        Expiration date:
+        11/2019
 
 * PayPal testing account:
 
-      username: ams-buyer@gmail.com
-      password: 11111111
+        username: ams-buyer@gmail.com
+        password: 11111111
